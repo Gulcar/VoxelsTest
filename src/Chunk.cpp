@@ -30,11 +30,14 @@ namespace voxr
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+
+        m_voxels = new Voxel[width * width * width];
     }
 
     Chunk::~Chunk()
     {
         //glDeleteVertexArrays(1, &m_vao);
+        delete m_voxels;
     }
 
     void AddFaceBottom(const glm::vec3& center, std::vector<Vertex>& vertices, const glm::vec3& color)
@@ -185,9 +188,9 @@ namespace voxr
 
         for (int y = width - 1; y >= 0; y--)
         {
-            for (int x = 0; x < width; x++)
+            for (int z = 0; z < width; z++)
             {
-                for (int z = 0; z < width; z++)
+                for (int x = 0; x < width; x++)
                 {
                     if (GetVoxel(x, y, z) == Voxel::Air)
                         continue;

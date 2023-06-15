@@ -26,16 +26,14 @@ public:
 
     inline Voxel GetVoxel(int x, int y, int z) const
     {
-        assert(x >= 0 && x < width && "voxel index out of bounds!");
-        assert(y >= 0 && y < width && "voxel index out of bounds!");
-        assert(z >= 0 && z < width && "voxel index out of bounds!");
-
-        return m_voxels[z][y][x];
+        AssertIndex(x, y, z);
+        return m_voxels[x + y * width + z * width * width];
     }
 
     inline void SetVoxel(Voxel v, int x, int y, int z)
     {
-        m_voxels[z][y][x] = v;
+        AssertIndex(x, y, z);
+        m_voxels[x + y * width + z * width * width] = v;
     }
 
     inline void Clear()
@@ -51,9 +49,18 @@ public:
     static constexpr int width = 128;
     
 private:
-    Voxel m_voxels[width][width][width];
+    Voxel* m_voxels;
     uint32_t m_vao, m_vbo;
     size_t m_numVertices = 0;
+
+
+private:
+    void AssertIndex(int x, int y, int z) const
+    {
+        assert(x >= 0 && x < width && "voxel index out of bounds!");
+        assert(y >= 0 && y < width && "voxel index out of bounds!");
+        assert(z >= 0 && z < width && "voxel index out of bounds!");
+    }
 };
 
 }
