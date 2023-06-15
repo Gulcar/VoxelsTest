@@ -5,6 +5,7 @@ project(VoxelsTest)
 add_executable(${PROJECT_NAME}
 	src/Main.cpp
 	src/VoxelRenderer.cpp
+    src/Chunk.cpp
 
 	deps/glad-3.3-khrdebug/src/glad.c
 )
@@ -12,9 +13,11 @@ add_executable(${PROJECT_NAME}
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
 add_subdirectory(deps/glfw)
+add_subdirectory(deps/libnoise)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	glfw
+    libnoise
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -22,4 +25,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	deps/glfw/include
 	deps/glad-3.3-khrdebug/include
 	deps/glm
+    deps/libnoise/include
 )

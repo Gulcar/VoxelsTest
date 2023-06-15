@@ -74,7 +74,7 @@ namespace voxr
 			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-right
 			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-right
 			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-left
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // bottom-left
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // bottom-left
 			// left face
 			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // top-right
 			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, // top-left
@@ -155,6 +155,11 @@ namespace voxr
 		if (glfwGetKey(m_window, GLFW_KEY_A))
 			m_camPos -= m_camRight * m_moveSpeed * deltaTime;
 
+        if (glfwGetKey(m_window, GLFW_KEY_E))
+            m_camPos.y += m_moveSpeed * deltaTime;
+        if (glfwGetKey(m_window, GLFW_KEY_Q))
+            m_camPos.y -= m_moveSpeed * deltaTime;
+
 		if (glfwGetKey(m_window, GLFW_KEY_LEFT))
 			m_camRot -= m_rotationSpeed * deltaTime;
 		if (glfwGetKey(m_window, GLFW_KEY_RIGHT))
@@ -208,6 +213,26 @@ namespace voxr
 		DrawText(buf, pos);
 	}
 
+    void DrawChunk(const Chunk& chunk, const glm::vec3& pos)
+    {
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, pos);
+
+		glm::mat4 view = glm::lookAt(m_camPos, m_camPos + m_camForward, glm::vec3(0, 1, 0));
+		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)m_windowSize.x / m_windowSize.y, 0.01f, 100.0f);
+
+		glUseProgram(m_shaderProgram);
+
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uView"), 1, GL_FALSE, &view[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uProjection"), 1, GL_FALSE, &projection[0][0]);
+		glUniform3f(glGetUniformLocation(m_shaderProgram, "uColor"), 0.5, 1.0, 0.5);
+
+        glBindVertexArray(chunk.GetVao());
+        glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());
+
+    }
+
 	uint32_t LoadShader(std::string_view source, GLenum type)
 	{
 		const char* data = source.data();
@@ -222,6 +247,7 @@ namespace voxr
 	{
 		std::ifstream file(vertShaderFile);
 		if (file.is_open() == false) file.open(std::string("../../../") + vertShaderFile);
+		if (file.is_open() == false) file.open(std::string("../") + vertShaderFile);
 		if (file.is_open() == false)
 		{
 			std::cout << "failed to open file: " << vertShaderFile << "\n";
@@ -234,6 +260,7 @@ namespace voxr
 
 		file.open(fragShaderFile);
 		if (file.is_open() == false) file.open(std::string("../../../") + fragShaderFile);
+		if (file.is_open() == false) file.open(std::string("../") + fragShaderFile);
 		if (file.is_open() == false)
 		{
 			std::cout << "failed to open file: " << fragShaderFile << "\n";

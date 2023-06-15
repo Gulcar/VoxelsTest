@@ -7,3 +7,6 @@
 [submodule "deps/glText"]
 	path = deps/glText
 	url = https://github.com/vallentin/glText
+[submodule "deps/libnoise"]
+	path = deps/libnoise
+	url = https://github.com/eXpl0it3r/libnoise
