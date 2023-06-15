@@ -1,11 +1,13 @@
 #include "Chunk.h"
 #include "VoxelRenderer.h"
 #include <vector>
+#include <glm/common.hpp>
 
 struct Vertex
 {
     glm::vec3 pos;
     glm::vec3 normal;
+    glm::vec3 color;
 };
 
 constexpr auto r = 1.0f / 16.0f / 2.0f;
@@ -24,6 +26,8 @@ namespace voxr
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
     }
 
     Chunk::~Chunk()
@@ -31,7 +35,7 @@ namespace voxr
         //glDeleteVertexArrays(1, &m_vao);
     }
 
-    void AddFaceBottom(const glm::vec3& center, std::vector<Vertex>& vertices)
+    void AddFaceBottom(const glm::vec3& center, std::vector<Vertex>& vertices, const glm::vec3& color)
     {
         Vertex v1;
         v1.pos = center + glm::vec3(-r, -r, -r);
@@ -42,6 +46,9 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, -r, r);
 
+        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, -1, 0);
+        v1.color = v2.color = v3.color = v4.color = color;
+
         vertices.push_back(v1);
         vertices.push_back(v2);
         vertices.push_back(v3);
@@ -51,7 +58,7 @@ namespace voxr
         vertices.push_back(v1);
     }
     
-    void AddFaceTop(const glm::vec3& center, std::vector<Vertex>& vertices)
+    void AddFaceTop(const glm::vec3& center, std::vector<Vertex>& vertices, const glm::vec3& color)
     {
         Vertex v1;
         v1.pos = center + glm::vec3(-r, r, -r);
@@ -62,6 +69,9 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, r, r);
 
+        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 1, 0);
+        v1.color = v2.color = v3.color = v4.color = color;
+
         vertices.push_back(v3);
         vertices.push_back(v2);
         vertices.push_back(v1);
@@ -71,7 +81,7 @@ namespace voxr
         vertices.push_back(v3);
     }
     
-    void AddFaceLeft(const glm::vec3& center, std::vector<Vertex>& vertices)
+    void AddFaceLeft(const glm::vec3& center, std::vector<Vertex>& vertices, const glm::vec3& color)
     {
         Vertex v1;
         v1.pos = center + glm::vec3(-r, -r, -r);
@@ -82,6 +92,9 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, r, -r);
 
+        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(-1, 0, 0);
+        v1.color = v2.color = v3.color = v4.color = color;
+
         vertices.push_back(v1);
         vertices.push_back(v2);
         vertices.push_back(v3);
@@ -91,7 +104,7 @@ namespace voxr
         vertices.push_back(v1);
     }
 
-    void AddFaceRight(const glm::vec3& center, std::vector<Vertex>& vertices)
+    void AddFaceRight(const glm::vec3& center, std::vector<Vertex>& vertices, const glm::vec3& color)
     {
         Vertex v1;
         v1.pos = center + glm::vec3(r, -r, -r);
@@ -102,6 +115,9 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(r, r, -r);
 
+        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(1, 0, 0);
+        v1.color = v2.color = v3.color = v4.color = color;
+
         vertices.push_back(v3);
         vertices.push_back(v2);
         vertices.push_back(v1);
@@ -111,7 +127,7 @@ namespace voxr
         vertices.push_back(v3);
     }
 
-    void AddFaceFront(const glm::vec3& center, std::vector<Vertex>& vertices)
+    void AddFaceFront(const glm::vec3& center, std::vector<Vertex>& vertices, const glm::vec3& color)
     {
         Vertex v1;
         v1.pos = center + glm::vec3(-r, -r, r);
@@ -122,6 +138,9 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, r, r);
 
+        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 0, 1);
+        v1.color = v2.color = v3.color = v4.color = color;
+
         vertices.push_back(v1);
         vertices.push_back(v2);
         vertices.push_back(v3);
@@ -131,7 +150,7 @@ namespace voxr
         vertices.push_back(v1);
     }
 
-    void AddFaceBack(const glm::vec3& center, std::vector<Vertex>& vertices)
+    void AddFaceBack(const glm::vec3& center, std::vector<Vertex>& vertices, const glm::vec3& color)
     {
         Vertex v1;
         v1.pos = center + glm::vec3(-r, -r, -r);
@@ -141,6 +160,9 @@ namespace voxr
         v3.pos = center + glm::vec3(r, r, -r);
         Vertex v4;
         v4.pos = center + glm::vec3(-r, r, -r);
+
+        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 0, -1);
+        v1.color = v2.color = v3.color = v4.color = color;
 
         vertices.push_back(v3);
         vertices.push_back(v2);
@@ -172,12 +194,26 @@ namespace voxr
                         z * 1.0f / 16.0f
                     };
 
-                    AddFaceBottom(center, vertices);
-                    AddFaceTop(center, vertices);
-                    AddFaceLeft(center, vertices);
-                    AddFaceRight(center, vertices);
-                    AddFaceFront(center, vertices);
-                    AddFaceBack(center, vertices);
+                    glm::vec3 color = glm::vec3((float)rand() / (float)RAND_MAX, 1.0f, 0.5f);
+
+
+                    if (y == 0 || GetVoxel(x, y - 1, z) == Voxel::Air)
+                        AddFaceBottom(center, vertices, color);
+
+                    if (y == width - 1 || GetVoxel(x, y + 1, z) == Voxel::Air)
+                        AddFaceTop(center, vertices, color);
+
+                    if (x == 0 || GetVoxel(x - 1, y, z) == Voxel::Air)
+                        AddFaceLeft(center, vertices, color);
+
+                    if (x == width - 1 || GetVoxel(x + 1, y, z) == Voxel::Air)
+                        AddFaceRight(center, vertices, color);
+
+                    if (z == width - 1 || GetVoxel(x, y, z + 1) == Voxel::Air)
+                        AddFaceFront(center, vertices, color);
+
+                    if (z == 0 || GetVoxel(x, y, z - 1) == Voxel::Air)
+                        AddFaceBack(center, vertices, color);
                 }
             }
         }

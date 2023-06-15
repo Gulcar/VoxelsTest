@@ -62,47 +62,47 @@ namespace voxr
 
 		float cubeVertices[] = {
 			// back face
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // bottom-left
-			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // top-right
-			 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // bottom-right         
-			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // top-right
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // bottom-left
-			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // top-left
+			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f, 1.0f, // bottom-left
+			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f, 1.0f, // top-right
+			 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f, 1.0f, // bottom-right         
+			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f, 1.0f, // top-right
+			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f, 1.0f, // bottom-left
+			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f, 1.0f, // top-left
 			// front face
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // bottom-left
-			 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // bottom-right
-			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-right
-			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-right
-			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-left
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // bottom-left
+			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, 1.0f, // bottom-left
+			 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, 1.0f, // bottom-right
+			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, 1.0f, // top-right
+			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, 1.0f, // top-right
+			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, 1.0f, // top-left
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, 1.0f, // bottom-left
 			// left face
-			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // top-right
-			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, // top-left
-			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, // bottom-left
-			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, // bottom-left
-			-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // bottom-right
-			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // top-right
+			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-left
+			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-left
+			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-left
+			-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-right
+			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
 			// right face
-			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // top-left
-			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, // bottom-right
-			 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, // top-right         
-			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, // bottom-right
-			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // top-left
-			 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // bottom-left     
+			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-left
+			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-right
+			 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right         
+			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-right
+			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-left
+			 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-left     
 			// bottom face
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // top-right
-			 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // top-left
-			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, // bottom-left
-			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, // bottom-left
-			-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, // bottom-right
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // top-right
+			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+			 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-left
+			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-left
+			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-left
+			-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-right
+			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
 			// top face
-			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // top-left
-			 0.5f,  0.5f , 0.5f,  0.0f,  1.0f,  0.0f, // bottom-right
-			 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // top-right     
-			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, // bottom-right
-			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // top-left
-			-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, // bottom-left        
+			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-left
+			 0.5f,  0.5f , 0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-right
+			 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right     
+			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-right
+			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-left
+			-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, 1.0f, // bottom-left        
 		};
 
 		uint32_t cubeVbo;
@@ -115,9 +115,11 @@ namespace voxr
 		glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(sizeof(float) * 0));
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(sizeof(float) * 3));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(sizeof(float) * 6));
 
 		//
 
@@ -180,7 +182,7 @@ namespace voxr
 		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uView"), 1, GL_FALSE, &view[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uProjection"), 1, GL_FALSE, &projection[0][0]);
-		glUniform3fv(glGetUniformLocation(m_shaderProgram, "uColor"), 1, &color.r);
+        // uColor
 
 		glBindVertexArray(m_cubeVao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -226,7 +228,6 @@ namespace voxr
 		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uView"), 1, GL_FALSE, &view[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uProjection"), 1, GL_FALSE, &projection[0][0]);
-		glUniform3f(glGetUniformLocation(m_shaderProgram, "uColor"), 0.5, 1.0, 0.5);
 
         glBindVertexArray(chunk.GetVao());
         glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());
@@ -240,6 +241,18 @@ namespace voxr
 		uint32_t shader = glCreateShader(type);
 		glShaderSource(shader, 1, &data, 0);
 		glCompileShader(shader);
+
+		int success;
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+		if (!success)
+		{
+			int logLength;
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
+			char* log = new char[logLength];
+			glGetShaderInfoLog(shader, logLength, 0, log);
+			printf("Failed to compile shader!\n%s\n", log);
+		}
+
 		return shader;
 	}
 

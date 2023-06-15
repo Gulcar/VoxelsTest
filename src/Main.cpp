@@ -14,7 +14,7 @@ int main()
     for (int x = 0; x < chunk.width; x++)
         for (int y = 0; y < chunk.width; y++)
             for (int z = 0; z < chunk.width; z++)
-                if (noise::ValueNoise3D(x, y, z) > 0.5)
+                if (noise::ValueNoise3D(x, y, z) > 0.0)
                     chunk.SetVoxel(voxr::Voxel::Grass, x, y, z);
 
     chunk.GenerateMesh();
@@ -33,9 +33,12 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /*
-		voxr::DrawCube(glm::vec3(0, 0, 0), glm::vec3(1.0f, 0.1f, 0.1f));
 
+		voxr::DrawCube(glm::vec3(0, 0, 0), glm::vec3(1.0f, 0.1f, 0.1f));
+		voxr::DrawCube(glm::vec3(0.1, 0, 0), glm::vec3(1.0f, 0.1f, 0.1f));
+		voxr::DrawCube(glm::vec3(0.2, 0, 0), glm::vec3(1.0f, 0.1f, 0.1f));
+
+        /*
 		for (float x = -2.5f; x <= 2.5f; x += 1.0f / 16.0f)
 			for (float z = -2.5f; z <= 2.5f; z += 1.0f / 16.0f)
 			    for (float y = -2.5f; y <= 0.0f; y += 1.0f / 16.0f)

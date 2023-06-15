@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <glm/vec3.hpp>
+#include <assert.h>
 
 namespace voxr
 {
@@ -25,6 +26,10 @@ public:
 
     inline Voxel GetVoxel(int x, int y, int z) const
     {
+        assert(x >= 0 && x < width && "voxel index out of bounds!");
+        assert(y >= 0 && y < width && "voxel index out of bounds!");
+        assert(z >= 0 && z < width && "voxel index out of bounds!");
+
         return m_voxels[z][y][x];
     }
 
