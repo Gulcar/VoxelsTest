@@ -11,11 +11,15 @@ int main()
     voxr::Chunk chunk;
     chunk.Clear();
 
+    noise::module::Perlin perlin;
+    float perlinScale = 15.0f;
+
     for (int x = 0; x < chunk.width; x++)
         for (int y = 0; y < chunk.width; y++)
             for (int z = 0; z < chunk.width; z++)
-                if (noise::ValueNoise3D(x, y, z) > 0.0)
+                if (perlin.GetValue((float)x / perlinScale, (float)y / perlinScale, (float)z / perlinScale) > 0.3)
                     chunk.SetVoxel(voxr::Voxel::Grass, x, y, z);
+
 
     chunk.GenerateMesh();
 	

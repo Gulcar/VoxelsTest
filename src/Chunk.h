@@ -48,7 +48,7 @@ public:
 
     void GenerateMesh();
 
-    static constexpr int width = 48;
+    static constexpr int width = 128;
     
 private:
     Voxel m_voxels[width][width][width];

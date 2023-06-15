@@ -2,6 +2,8 @@
 #include "VoxelRenderer.h"
 #include <vector>
 #include <glm/common.hpp>
+#include <chrono>
+#include <iostream>
 
 struct Vertex
 {
@@ -175,13 +177,15 @@ namespace voxr
 
     void Chunk::GenerateMesh()
     {
+        using Clock = std::chrono::high_resolution_clock;
+        auto startTime = Clock::now();
 
         std::vector<Vertex> vertices;
         vertices.reserve(m_numVertices);
 
-        for (int x = 0; x < width; x++)
+        for (int y = width - 1; y >= 0; y--)
         {
-            for (int y = 0; y < width; y++)
+            for (int x = 0; x < width; x++)
             {
                 for (int z = 0; z < width; z++)
                 {
@@ -223,6 +227,11 @@ namespace voxr
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
         
         m_numVertices = vertices.size();
+
+
+        auto duration = Clock::now() - startTime;
+        float time = std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0f;
+        std::cout << "chunk mesh generated (" << time << "ms)\n";
     }
 }
 
