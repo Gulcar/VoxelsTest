@@ -201,8 +201,9 @@ namespace voxr
                         z * 1.0f / 16.0f
                     };
 
-                    glm::vec3 color = glm::vec3((float)rand() / (float)RAND_MAX, 1.0f, 0.5f);
-
+                    constexpr glm::vec3 colorA = glm::vec3(216, 245, 86) / glm::vec3(255.0f);
+                    constexpr glm::vec3 colorB = glm::vec3(50, 191, 13) / glm::vec3(255.0f);
+                    glm::vec3 color = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
 
                     if (y == 0 || GetVoxel(x, y - 1, z) == Voxel::Air)
                         AddFaceBottom(center, vertices, color);

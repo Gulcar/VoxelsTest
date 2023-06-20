@@ -22,13 +22,24 @@ namespace
 	glm::vec3 m_camForward = {};
 	glm::vec3 m_camRight = {};
 
+	glm::mat4 m_viewProj;
+
 	constexpr float m_moveSpeed = 1.5f;
 	constexpr float m_rotationSpeed = 1.5f;
+
 
 	void OnGlfwResize(GLFWwindow* window, int width, int height)
 	{
 		m_windowSize = { width, height };
 		glViewport(0, 0, width, height);
+	}
+
+	void CalcViewProjMat()
+	{
+		glm::mat4 view = glm::lookAt(m_camPos, m_camPos + m_camForward, glm::vec3(0, 1, 0));
+		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)m_windowSize.x / m_windowSize.y, 0.01f, 100.0f);
+
+		m_viewProj = projection * view;
 	}
 }
 
@@ -166,6 +177,8 @@ namespace voxr
 			m_camRot -= m_rotationSpeed * deltaTime;
 		if (glfwGetKey(m_window, GLFW_KEY_RIGHT))
 			m_camRot += m_rotationSpeed * deltaTime;
+
+		CalcViewProjMat();
 	}
 
 	void DrawCube(const glm::vec3& pos, const glm::vec3 color)
@@ -174,15 +187,13 @@ namespace voxr
 		model = glm::translate(model, pos);
 		model = glm::scale(model, glm::vec3(1.0f / 16.0f));
 
-		glm::mat4 view = glm::lookAt(m_camPos, m_camPos + m_camForward, glm::vec3(0, 1, 0));
-		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)m_windowSize.x / m_windowSize.y, 0.01f, 100.0f);
+		glm::mat3 normalMat = glm::mat3(glm::transpose(glm::inverse(model)));
 
 		glUseProgram(m_shaderProgram);
 
 		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uView"), 1, GL_FALSE, &view[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uProjection"), 1, GL_FALSE, &projection[0][0]);
-        // uColor
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_viewProj[0][0]);
+		glUniformMatrix3fv(glGetUniformLocation(m_shaderProgram, "uNormalMat"), 1, GL_FALSE, &normalMat[0][0]);
 
 		glBindVertexArray(m_cubeVao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -220,14 +231,13 @@ namespace voxr
         glm::mat4 model(1.0f);
         model = glm::translate(model, pos);
 
-		glm::mat4 view = glm::lookAt(m_camPos, m_camPos + m_camForward, glm::vec3(0, 1, 0));
-		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)m_windowSize.x / m_windowSize.y, 0.01f, 100.0f);
+		glm::mat3 normalMat = glm::mat3(glm::transpose(glm::inverse(model)));
 
 		glUseProgram(m_shaderProgram);
 
 		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uView"), 1, GL_FALSE, &view[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uProjection"), 1, GL_FALSE, &projection[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_viewProj[0][0]);
+		glUniformMatrix3fv(glGetUniformLocation(m_shaderProgram, "uNormalMat"), 1, GL_FALSE, &normalMat[0][0]);
 
         glBindVertexArray(chunk.GetVao());
         glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());
@@ -259,7 +269,7 @@ namespace voxr
 	uint32_t LoadShaderProgram(const char* vertShaderFile, const char* fragShaderFile)
 	{
 		std::ifstream file(vertShaderFile);
-		if (file.is_open() == false) file.open(std::string("../../../") + vertShaderFile);
+		if (file.is_open() == false) file.open(std::string("../../") + vertShaderFile);
 		if (file.is_open() == false) file.open(std::string("../") + vertShaderFile);
 		if (file.is_open() == false)
 		{
@@ -272,7 +282,7 @@ namespace voxr
 		file.close();
 
 		file.open(fragShaderFile);
-		if (file.is_open() == false) file.open(std::string("../../../") + fragShaderFile);
+		if (file.is_open() == false) file.open(std::string("../../") + fragShaderFile);
 		if (file.is_open() == false) file.open(std::string("../") + fragShaderFile);
 		if (file.is_open() == false)
 		{
