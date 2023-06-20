@@ -15,9 +15,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/libnoise)
 
+find_package(OpenMP REQUIRED)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	glfw
     libnoise
+	OpenMP::OpenMP_CXX
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

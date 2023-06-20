@@ -1,6 +1,7 @@
 #include <iostream>
 #include "VoxelRenderer.h"
 #include <noise/noise.h>
+#include <omp.h>
 
 int main()
 {
@@ -27,7 +28,8 @@ int main()
     float perlinScale = 35.0f;
 
 	constexpr float chunkWorldWidth = voxr::Chunk::width * 1.0f / 16.0f;
-
+	
+#pragma omp parallel for
 	for (int z = 0; z < chunk.width; z++)
         for (int y = 0; y < chunk.width; y++)
 			for (int x = 0; x < chunk.width; x++)

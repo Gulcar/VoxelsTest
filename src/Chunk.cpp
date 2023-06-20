@@ -8,8 +8,8 @@
 struct Vertex
 {
     glm::vec3 pos;
-    glm::vec3 normal;
-    glm::vec3 color;
+    uint8_t normal; // samo indeks
+    glm::u8vec3 color; // 3 bytes
 };
 
 constexpr auto r = 1.0f / 16.0f / 2.0f;
@@ -27,9 +27,9 @@ namespace voxr
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+        glVertexAttribIPointer(2, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (void*)offsetof(Vertex, color));
 
         m_voxels = new Voxel[width * width * width];
     }
@@ -51,7 +51,8 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, -r, r);
 
-        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, -1, 0);
+        //v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, -1, 0);
+        v1.normal = v2.normal = v3.normal = v4.normal = 2;
         v1.color = v2.color = v3.color = v4.color = color;
 
         vertices.push_back(v1);
@@ -74,7 +75,8 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, r, r);
 
-        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 1, 0);
+        //v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 1, 0);
+        v1.normal = v2.normal = v3.normal = v4.normal = 3;
         v1.color = v2.color = v3.color = v4.color = color;
 
         vertices.push_back(v3);
@@ -97,7 +99,8 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, r, -r);
 
-        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(-1, 0, 0);
+        //v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(-1, 0, 0);
+        v1.normal = v2.normal = v3.normal = v4.normal = 0;
         v1.color = v2.color = v3.color = v4.color = color;
 
         vertices.push_back(v1);
@@ -120,7 +123,8 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(r, r, -r);
 
-        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(1, 0, 0);
+        //v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(1, 0, 0);
+        v1.normal = v2.normal = v3.normal = v4.normal = 1;
         v1.color = v2.color = v3.color = v4.color = color;
 
         vertices.push_back(v3);
@@ -143,7 +147,8 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, r, r);
 
-        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 0, 1);
+        //v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 0, 1);
+        v1.normal = v2.normal = v3.normal = v4.normal = 5;
         v1.color = v2.color = v3.color = v4.color = color;
 
         vertices.push_back(v1);
@@ -166,7 +171,8 @@ namespace voxr
         Vertex v4;
         v4.pos = center + glm::vec3(-r, r, -r);
 
-        v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 0, -1);
+        //v1.normal = v2.normal = v3.normal = v4.normal = glm::vec3(0, 0, -1);
+        v1.normal = v2.normal = v3.normal = v4.normal = 4;
         v1.color = v2.color = v3.color = v4.color = color;
 
         vertices.push_back(v3);
@@ -203,7 +209,9 @@ namespace voxr
 
                     constexpr glm::vec3 colorA = glm::vec3(216, 245, 86) / glm::vec3(255.0f);
                     constexpr glm::vec3 colorB = glm::vec3(50, 191, 13) / glm::vec3(255.0f);
-                    glm::vec3 color = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+                    glm::vec3 fcolor = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+
+                    glm::u8vec3 color = fcolor * 255.0f;
 
                     if (y == 0 || GetVoxel(x, y - 1, z) == Voxel::Air)
                         AddFaceBottom(center, vertices, color);
