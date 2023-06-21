@@ -207,11 +207,33 @@ namespace voxr
                         z * 1.0f / 16.0f
                     };
 
-                    constexpr glm::vec3 colorA = glm::vec3(216, 245, 86) / glm::vec3(255.0f);
-                    constexpr glm::vec3 colorB = glm::vec3(50, 191, 13) / glm::vec3(255.0f);
-                    glm::vec3 fcolor = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+                    glm::u8vec3 color;
 
-                    glm::u8vec3 color = fcolor * 255.0f;
+                    if (GetVoxel(x, y, z) == Voxel::Grass)
+                    {
+                        constexpr glm::vec3 colorA = glm::vec3(216, 245, 86) / glm::vec3(255.0f);
+                        constexpr glm::vec3 colorB = glm::vec3(50, 191, 13) / glm::vec3(255.0f);
+                        glm::vec3 fcolor = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+
+                        color = fcolor * 255.0f;
+                    }
+                    else if (GetVoxel(x, y, z) == Voxel::Sand)
+                    {
+                        constexpr glm::vec3 colorA = glm::vec3(247, 227, 7) / glm::vec3(255.0f);
+                        constexpr glm::vec3 colorB = glm::vec3(255, 242, 97) / glm::vec3(255.0f);
+                        glm::vec3 fcolor = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+
+                        color = fcolor * 255.0f;
+                    }
+                    else if (GetVoxel(x, y, z) == Voxel::Water)
+                    {
+                        constexpr glm::vec3 colorA = glm::vec3(37, 162, 245) / glm::vec3(255.0f);
+                        constexpr glm::vec3 colorB = glm::vec3(26, 130, 199) / glm::vec3(255.0f);
+                        glm::vec3 fcolor = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+
+                        color = fcolor * 255.0f;
+                    }
+                    
 
                     if (y == 0 || GetVoxel(x, y - 1, z) == Voxel::Air)
                         AddFaceBottom(center, vertices, color);

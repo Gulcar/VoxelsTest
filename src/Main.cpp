@@ -21,7 +21,17 @@ void PerlinTerrain(voxr::Chunk& chunk, glm::vec2 offset)
 
             for (int y = 0; y < blocks; y++)
             {
-                chunk.SetVoxel(voxr::Voxel::Grass, x, y, z);
+                voxr::Voxel v;
+                if (y > 48 && y < 52) v = voxr::Voxel::Sand;
+                else if (y > 46 && y < 54 && rand() % 2 == 0) v = voxr::Voxel::Sand;
+                else v = voxr::Voxel::Grass;
+                chunk.SetVoxel(v, x, y, z);
+            }
+
+            constexpr int waterHeight = 50;
+            for (int y = blocks; y < waterHeight; y++)
+            {
+                chunk.SetVoxel(voxr::Voxel::Water, x, y, z);
             }
         }
     }

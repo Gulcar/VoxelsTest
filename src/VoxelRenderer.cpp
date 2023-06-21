@@ -18,14 +18,18 @@ namespace
     uint32_t m_cubeVao;
 
     glm::vec3 m_camPos = { 0.0f, 0.5f, 2.0f };
-    float m_camRot = -PI / 2.0f;
+    glm::vec2 m_camRot = {};
     glm::vec3 m_camForward = {};
     glm::vec3 m_camRight = {};
 
     glm::mat4 m_viewProj;
 
+    bool m_mouseEnabled = true;
+    glm::dvec2 m_prevMousePos;
+    bool m_lineMode = false;
+
     constexpr float m_moveSpeed = 1.5f;
-    constexpr float m_rotationSpeed = 1.5f;
+    constexpr double m_rotationSpeed = 0.9;
 
 
     void OnGlfwResize(GLFWwindow* window, int width, int height)
@@ -40,6 +44,39 @@ namespace
         glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)m_windowSize.x / m_windowSize.y, 0.01f, 100.0f);
 
         m_viewProj = projection * view;
+    }
+
+    void OnGlfwKey(GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        if (action != GLFW_PRESS) return;
+
+        switch (key)
+        {
+        case GLFW_KEY_F: 
+            m_lineMode = !m_lineMode;
+            glPolygonMode(GL_FRONT_AND_BACK, m_lineMode ? GL_LINE : GL_FILL);
+            break;
+
+        case GLFW_KEY_ESCAPE:
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            m_mouseEnabled = false;
+            break;
+        }
+    }
+
+    void OnGlfwMouseButton(GLFWwindow* window, int button, int action, int mods)
+    {
+        if (action != GLFW_PRESS) return;
+
+        switch (button)
+        {
+        case GLFW_MOUSE_BUTTON_LEFT:
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            m_mouseEnabled = true;
+            glfwGetCursorPos(m_window, &m_prevMousePos.x, &m_prevMousePos.y);
+            break;
+        }
     }
 }
 
@@ -68,6 +105,12 @@ namespace voxr
         gltInit();
 
         glfwSwapInterval(0);
+
+        glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwGetCursorPos(m_window, &m_prevMousePos.x, &m_prevMousePos.y);
+
+        glfwSetKeyCallback(m_window, OnGlfwKey);
+        glfwSetMouseButtonCallback(m_window, OnGlfwMouseButton);
 
         //
 
@@ -145,19 +188,13 @@ namespace voxr
 
     void UpdateCamera(float deltaTime)
     {
-        m_camForward = {
-            cos(m_camRot),
-            0.0f,
-            sin(m_camRot),
-        };
+        glm::mat4 rotMat(1.0f);
+        rotMat = glm::rotate(rotMat, m_camRot.x, glm::vec3(0, -1, 0));
+        rotMat = glm::rotate(rotMat, m_camRot.y, glm::vec3(-1, 0, 0));
+        m_camForward = rotMat * glm::vec4(0, 0, -1, 1);
 
-        m_camRight = {
-            cos(m_camRot + PI / 2.0f),
-            0.0f,
-            sin(m_camRot + PI / 2.0f),
-        };
-
-        float speed = 1.4f * deltaTime;
+        rotMat = glm::rotate(rotMat, PI / 2.0f, glm::vec3(0, -1, 0));
+        m_camRight = rotMat * glm::vec4(0, 0, -1, 1);
 
         if (glfwGetKey(m_window, GLFW_KEY_W))
             m_camPos += m_camForward * m_moveSpeed * deltaTime;
@@ -173,15 +210,17 @@ namespace voxr
         if (glfwGetKey(m_window, GLFW_KEY_Q))
             m_camPos.y -= m_moveSpeed * deltaTime;
 
-        if (glfwGetKey(m_window, GLFW_KEY_LEFT))
-            m_camRot -= m_rotationSpeed * deltaTime;
-        if (glfwGetKey(m_window, GLFW_KEY_RIGHT))
-            m_camRot += m_rotationSpeed * deltaTime;
+        if (m_mouseEnabled)
+        {
+            glm::dvec2 mousePos;
+            glfwGetCursorPos(m_window, &mousePos.x, &mousePos.y);
 
-        if (glfwGetKey(m_window, GLFW_KEY_O))
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        if (glfwGetKey(m_window, GLFW_KEY_P))
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glm::dvec2 deltaMouse = mousePos - m_prevMousePos;
+            m_prevMousePos = mousePos;
+
+            m_camRot += deltaMouse / 1000.0 * m_rotationSpeed;
+            m_camRot.y = glm::clamp(m_camRot.y, -PI / 2.1f, PI / 2.1f);
+        }
 
         CalcViewProjMat();
     }
