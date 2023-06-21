@@ -243,7 +243,8 @@ namespace voxr
 
         auto duration = Clock::now() - startTime;
         float time = std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0f;
-        std::cout << "chunk mesh generated (" << time << "ms)\n";
+        int kbytes = vertices.size() * sizeof(Vertex) / 1000;
+        std::cout << "chunk mesh generated (" << time << "ms, " << kbytes << "kB)\n";
     }
 }
 

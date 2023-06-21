@@ -11,5 +11,5 @@ void main()
     float light = 0.3;
     light += max(dot(-lightDir, Normal), 0.0);
 
-	FragColor = vec4(Color * light, 1.0);
+    FragColor = vec4(Color * light, 1.0);
 }

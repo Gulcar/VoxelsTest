@@ -28,5 +28,5 @@ void main()
     Normal = uNormalMat * normal;
     Color = aColor / 255.0f;
 
-	gl_Position = uViewProj * uModel * vec4(aPos, 1.0);
+    gl_Position = uViewProj * uModel * vec4(aPos, 1.0);
 }
