@@ -8,6 +8,7 @@ uniform mat4 uModel;
 uniform mat4 uViewProj;
 uniform mat3 uNormalMat;
 
+out vec3 FragCoord;
 out vec3 Normal;
 out vec3 Color;
 
@@ -25,6 +26,7 @@ void main()
     case 5u: normal = vec3(0, 0, 1); break;
     }
 
+    FragCoord = (uModel * vec4(aPos, 1.0)).xyz;
     Normal = uNormalMat * normal;
     Color = aColor / 255.0f;
 

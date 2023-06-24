@@ -261,6 +261,7 @@ namespace voxr
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_viewProj[0][0]);
         glUniformMatrix3fv(glGetUniformLocation(m_shaderProgram, "uNormalMat"), 1, GL_FALSE, &normalMat[0][0]);
+        glUniform3fv(glGetUniformLocation(m_shaderProgram, "uCameraPos"), 1, &m_camPos[0]);
 
         glBindVertexArray(m_cubeVao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -305,6 +306,7 @@ namespace voxr
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_viewProj[0][0]);
         glUniformMatrix3fv(glGetUniformLocation(m_shaderProgram, "uNormalMat"), 1, GL_FALSE, &normalMat[0][0]);
+        glUniform3fv(glGetUniformLocation(m_shaderProgram, "uCameraPos"), 1, &m_camPos[0]);
 
         glBindVertexArray(chunk.GetVao());
         glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());

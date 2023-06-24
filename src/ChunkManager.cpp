@@ -68,7 +68,7 @@ namespace voxr
     {
         void GenerateChunks()
         {
-            TIME_FUNCTION("GenerateChunks");
+            TIME_FUNCTION("ChunkManager::GenerateChunks");
 
             m_centerChunkPos = glm::vec3(0, 0, 0);
 
