@@ -35,6 +35,9 @@ namespace
 
     void OnGlfwResize(GLFWwindow* window, int width, int height)
     {
+        if (width == 0 || height == 0)
+            return;
+
         m_windowSize = { width, height };
         glViewport(0, 0, width, height);
     }
@@ -79,12 +82,19 @@ namespace
             break;
         }
     }
+
+    void OnGlfwError(int error, const char* desc)
+    {
+        std::cout << "GLFW ERROR " << error << ": " << desc << "\n";
+    }
 }
 
 namespace voxr
 {
     void CreateWindow(const char* title, int width, int height)
     {
+        glfwSetErrorCallback(OnGlfwError);
+
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -379,6 +389,8 @@ namespace voxr
             char* log = new char[logLength];
             glGetProgramInfoLog(program, logLength, 0, log);
             printf("Failed to link shader!\n%s\n", log);
+
+            std::exit(1);
         }
 
         glDetachShader(program, vertexShader);

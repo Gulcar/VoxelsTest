@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <chrono>
 #include <iostream>
-#include <queue>
+#include <deque>
 
 namespace
 {
@@ -18,7 +18,7 @@ namespace
         voxr::Chunk* chunk;
         glm::vec2 pos;
     };
-    std::queue<LoadItem> m_loadQueue;
+    std::deque<LoadItem> m_loadQueue;
 
 
     void PerlinTerrain(voxr::Chunk* chunk, glm::vec2 offset)
@@ -90,12 +90,29 @@ namespace voxr
                     delete m_chunks[z][x];
         }
 
+        void DeleteChunk(int x, int z)
+        {
+            Chunk* chunk = GetChunk(x, z);
+
+            // ce ne izbrisem se iz load queue-ja potem bo crash ko bo prisel na vrsto za loadanje
+            for (auto it = m_loadQueue.begin(); it != m_loadQueue.end(); it++)
+            {
+                if (it->chunk == chunk)
+                {
+                    m_loadQueue.erase(it);
+                    break;
+                }
+            }
+
+            delete chunk;
+        }
+
         void UpdateCameraRight()
         {
             m_centerChunkPos.x += Chunk::worldWidth;
 
             for (int z = 0; z < width; z++)
-                delete GetChunk(0, z);
+                DeleteChunk(0, z);
 
             for (int x = 1; x < width; x++)
             {
@@ -115,7 +132,7 @@ namespace voxr
                 pos.x = m_centerChunkPos.x + Chunk::worldWidth * (width - 1);
                 pos.y = m_centerChunkPos.z + Chunk::worldWidth * (z);
 
-                m_loadQueue.push({ chunk, pos });
+                m_loadQueue.push_back({ chunk, pos });
                 //PerlinTerrain(chunk, pos);
             }
         }
@@ -125,7 +142,7 @@ namespace voxr
             m_centerChunkPos.x -= Chunk::worldWidth;
 
             for (int z = 0; z < width; z++)
-                delete GetChunk(width - 1, z);
+                DeleteChunk(width - 1, z);
 
             for (int x = width - 2; x >= 0; x--)
             {
@@ -145,7 +162,7 @@ namespace voxr
                 pos.x = m_centerChunkPos.x;
                 pos.y = m_centerChunkPos.z + Chunk::worldWidth * (z);
 
-                m_loadQueue.push({ chunk, pos });
+                m_loadQueue.push_back({ chunk, pos });
                 //PerlinTerrain(chunk, pos);
             }
         }
@@ -155,7 +172,7 @@ namespace voxr
             m_centerChunkPos.z += Chunk::worldWidth;
 
             for (int x = 0; x < width; x++)
-                delete GetChunk(x, 0);
+                DeleteChunk(x, 0);
 
             for (int z = 1; z < width; z++)
             {
@@ -175,7 +192,7 @@ namespace voxr
                 pos.x = m_centerChunkPos.x + Chunk::worldWidth * x;
                 pos.y = m_centerChunkPos.z + Chunk::worldWidth * (width - 1);
 
-                m_loadQueue.push({ chunk, pos });
+                m_loadQueue.push_back({ chunk, pos });
                 //PerlinTerrain(chunk, pos);
             }
         }
@@ -185,7 +202,7 @@ namespace voxr
             m_centerChunkPos.z -= Chunk::worldWidth;
 
             for (int x = 0; x < width; x++)
-                delete GetChunk(x, width - 1);
+                DeleteChunk(x, width - 1);
 
             for (int z = width - 2; z >= 0; z--)
             {
@@ -205,7 +222,7 @@ namespace voxr
                 pos.x = m_centerChunkPos.x + Chunk::worldWidth * x;
                 pos.y = m_centerChunkPos.z;
 
-                m_loadQueue.push({ chunk, pos });
+                m_loadQueue.push_back({ chunk, pos });
                 //PerlinTerrain(chunk, pos);
             }
         }
@@ -238,7 +255,7 @@ namespace voxr
 
                 PerlinTerrain(loadItem.chunk, loadItem.pos);
 
-                m_loadQueue.pop();
+                m_loadQueue.pop_front();
             }
         }
 

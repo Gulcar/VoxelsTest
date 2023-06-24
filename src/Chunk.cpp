@@ -32,11 +32,14 @@ namespace voxr
         glVertexAttribIPointer(2, 3, GL_UNSIGNED_BYTE, sizeof(Vertex), (void*)offsetof(Vertex, color));
 
         m_voxels = new Voxel[width * width * width];
+        assert(m_voxels != nullptr && "Failed to allocate voxels for a chunk!");
     }
 
     Chunk::~Chunk()
     {
-        //glDeleteVertexArrays(1, &m_vao);
+        glDeleteVertexArrays(1, &m_vao);
+        glDeleteBuffers(1, &m_vbo);
+
         delete[] m_voxels;
     }
 

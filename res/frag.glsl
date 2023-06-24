@@ -10,7 +10,7 @@ uniform vec3 uCameraPos;
 
 const vec3 lightDir = normalize(vec3(0.5, -1.5, -0.7));
 
-const float fogDensity = 0.05;
+const bool fogEnabled = true;
 const vec3 fogColor = vec3(0.471, 0.831, 0.941);
 
 vec3 CalculateFog(vec3 color)
@@ -29,7 +29,9 @@ void main()
     light += max(dot(-lightDir, Normal), 0.0);
 
     vec3 color = Color * light;
-    color = CalculateFog(color);
+
+    if (fogEnabled)
+        color = CalculateFog(color);
 
     FragColor = vec4(color, 1.0);
 }
