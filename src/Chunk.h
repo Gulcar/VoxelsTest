@@ -45,7 +45,8 @@ public:
 
     void GenerateMesh();
 
-    static constexpr int width = 256;
+    static constexpr int width = 64;
+    static constexpr float worldWidth = width * 1.0f / 16.0f;
     
 private:
     Voxel* m_voxels;

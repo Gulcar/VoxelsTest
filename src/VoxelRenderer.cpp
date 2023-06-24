@@ -28,7 +28,7 @@ namespace
     glm::dvec2 m_prevMousePos;
     bool m_lineMode = false;
 
-    constexpr float m_moveSpeed = 1.5f;
+    constexpr float m_moveSpeed = 2.0f;
     constexpr double m_rotationSpeed = 0.9;
 
 
@@ -196,14 +196,25 @@ namespace voxr
         rotMat = glm::rotate(rotMat, PI / 2.0f, glm::vec3(0, -1, 0));
         m_camRight = rotMat * glm::vec4(0, 0, -1, 1);
 
+        glm::vec3 moveForward = m_camForward;
+        glm::vec3 moveRight = m_camRight;
+
+        if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL))
+        {
+            moveForward.y = 0.0f;
+            moveForward = glm::normalize(moveForward);
+            moveRight.y = 0.0f;
+            moveRight = glm::normalize(moveRight);
+        }
+
         if (glfwGetKey(m_window, GLFW_KEY_W))
-            m_camPos += m_camForward * m_moveSpeed * deltaTime;
+            m_camPos += moveForward * m_moveSpeed * deltaTime;
         if (glfwGetKey(m_window, GLFW_KEY_S))
-            m_camPos -= m_camForward * m_moveSpeed * deltaTime;
+            m_camPos -= moveForward * m_moveSpeed * deltaTime;
         if (glfwGetKey(m_window, GLFW_KEY_D))
-            m_camPos += m_camRight * m_moveSpeed * deltaTime;
+            m_camPos += moveRight * m_moveSpeed * deltaTime;
         if (glfwGetKey(m_window, GLFW_KEY_A))
-            m_camPos -= m_camRight * m_moveSpeed * deltaTime;
+            m_camPos -= moveRight * m_moveSpeed * deltaTime;
 
         if (glfwGetKey(m_window, GLFW_KEY_E))
             m_camPos.y += m_moveSpeed * deltaTime;
@@ -223,6 +234,11 @@ namespace voxr
         }
 
         CalcViewProjMat();
+    }
+
+    const glm::vec3& GetCameraPos()
+    {
+        return m_camPos;
     }
 
     void DrawCube(const glm::vec3& pos, const glm::vec3 color)

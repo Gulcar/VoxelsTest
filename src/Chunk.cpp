@@ -37,7 +37,7 @@ namespace voxr
     Chunk::~Chunk()
     {
         //glDeleteVertexArrays(1, &m_vao);
-        delete m_voxels;
+        delete[] m_voxels;
     }
 
     void AddFaceBottom(const glm::vec3& center, std::vector<Vertex>& vertices, const glm::vec3& color)
@@ -192,19 +192,23 @@ namespace voxr
         std::vector<Vertex> vertices;
         vertices.reserve(m_numVertices);
 
+        srand(69u);
+
         for (int y = width - 1; y >= 0; y--)
         {
             for (int z = 0; z < width; z++)
             {
                 for (int x = 0; x < width; x++)
                 {
+                    float frand = (float)rand() / RAND_MAX;
+
                     if (GetVoxel(x, y, z) == Voxel::Air)
                         continue;
 
                     glm::vec3 center = {
-                        x * 1.0f / 16.0f,
-                        y * 1.0f / 16.0f,
-                        z * 1.0f / 16.0f
+                        (x - width / 2.0f) * 1.0f / 16.0f,
+                        (y - width / 2.0f) * 1.0f / 16.0f,
+                        (z - width / 2.0f) * 1.0f / 16.0f
                     };
 
                     glm::u8vec3 color;
@@ -213,7 +217,7 @@ namespace voxr
                     {
                         constexpr glm::vec3 colorA = glm::vec3(216, 245, 86) / glm::vec3(255.0f);
                         constexpr glm::vec3 colorB = glm::vec3(50, 191, 13) / glm::vec3(255.0f);
-                        glm::vec3 fcolor = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+                        glm::vec3 fcolor = glm::mix(colorA, colorB, frand);
 
                         color = fcolor * 255.0f;
                     }
@@ -221,7 +225,7 @@ namespace voxr
                     {
                         constexpr glm::vec3 colorA = glm::vec3(247, 227, 7) / glm::vec3(255.0f);
                         constexpr glm::vec3 colorB = glm::vec3(255, 242, 97) / glm::vec3(255.0f);
-                        glm::vec3 fcolor = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+                        glm::vec3 fcolor = glm::mix(colorA, colorB, frand);
 
                         color = fcolor * 255.0f;
                     }
@@ -229,7 +233,7 @@ namespace voxr
                     {
                         constexpr glm::vec3 colorA = glm::vec3(37, 162, 245) / glm::vec3(255.0f);
                         constexpr glm::vec3 colorB = glm::vec3(26, 130, 199) / glm::vec3(255.0f);
-                        glm::vec3 fcolor = glm::mix(colorA, colorB, (float)rand() / RAND_MAX);
+                        glm::vec3 fcolor = glm::mix(colorA, colorB, frand);
 
                         color = fcolor * 255.0f;
                     }

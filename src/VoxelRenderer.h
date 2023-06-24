@@ -17,6 +17,7 @@ namespace voxr
     GLFWwindow* GetWindow();
 
     void UpdateCamera(float deltaTime);
+    const glm::vec3& GetCameraPos();
 
     void DrawCube(const glm::vec3& pos, const glm::vec3 color = glm::vec3(1.0f));
     void DrawText(std::string_view text, glm::vec2 pos = glm::vec2(0.0f));
