@@ -186,9 +186,6 @@ namespace voxr
 
     void Chunk::GenerateMesh()
     {
-        using Clock = std::chrono::high_resolution_clock;
-        auto startTime = Clock::now();
-
         std::vector<Vertex> vertices;
         vertices.reserve(m_numVertices);
 
@@ -265,12 +262,6 @@ namespace voxr
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
         
         m_numVertices = vertices.size();
-
-
-        auto duration = Clock::now() - startTime;
-        float time = std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0f;
-        int kbytes = vertices.size() * sizeof(Vertex) / 1000;
-        std::cout << "chunk mesh generated (" << time << "ms, " << kbytes << "kB)\n";
     }
 }
 

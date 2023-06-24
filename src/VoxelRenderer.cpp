@@ -29,6 +29,7 @@ namespace
     bool m_lineMode = false;
 
     constexpr float m_moveSpeed = 2.0f;
+    constexpr float m_sprintSpeedMult = 2.5f;
     constexpr double m_rotationSpeed = 0.9;
 
 
@@ -205,6 +206,12 @@ namespace voxr
             moveForward = glm::normalize(moveForward);
             moveRight.y = 0.0f;
             moveRight = glm::normalize(moveRight);
+        }
+
+        if (glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT))
+        {
+            moveForward *= m_sprintSpeedMult;
+            moveRight *= m_sprintSpeedMult;
         }
 
         if (glfwGetKey(m_window, GLFW_KEY_W))

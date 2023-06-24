@@ -1,16 +1,24 @@
 #include "ChunkManager.h"
-#include <assert.h>
+#include "VoxelRenderer.h"
+#include "FuncTimer.h"
 #include <glm/glm.hpp>
 #include <noise/noise.h>
-#include "VoxelRenderer.h"
+#include <assert.h>
 #include <chrono>
 #include <iostream>
+#include <queue>
 
 namespace
 {
     voxr::Chunk* m_chunks[voxr::ChunkManager::width][voxr::ChunkManager::width];
-
     glm::vec3 m_centerChunkPos;
+
+    struct LoadItem
+    {
+        voxr::Chunk* chunk;
+        glm::vec2 pos;
+    };
+    std::queue<LoadItem> m_loadQueue;
 
 
     void PerlinTerrain(voxr::Chunk* chunk, glm::vec2 offset)
@@ -60,6 +68,8 @@ namespace voxr
     {
         void GenerateChunks()
         {
+            TIME_FUNCTION("GenerateChunks");
+
             m_centerChunkPos = glm::vec3(0, 0, 0);
 
             for (int z = 0; z < width; z++)
@@ -80,137 +90,155 @@ namespace voxr
                     delete m_chunks[z][x];
         }
 
+        void UpdateCameraRight()
+        {
+            m_centerChunkPos.x += Chunk::worldWidth;
+
+            for (int z = 0; z < width; z++)
+                delete GetChunk(0, z);
+
+            for (int x = 1; x < width; x++)
+            {
+                for (int z = 0; z < width; z++)
+                {
+                    Chunk* chunk = GetChunk(x, z);
+                    SetChunk(chunk, x - 1, z);
+                }
+            }
+
+            for (int z = 0; z < width; z++)
+            {
+                Chunk* chunk = new Chunk;
+                SetChunk(chunk, width - 1, z);
+
+                glm::vec2 pos;
+                pos.x = m_centerChunkPos.x + Chunk::worldWidth * (width - 1);
+                pos.y = m_centerChunkPos.z + Chunk::worldWidth * (z);
+
+                m_loadQueue.push({ chunk, pos });
+                //PerlinTerrain(chunk, pos);
+            }
+        }
+
+        void UpdateCameraLeft()
+        {
+            m_centerChunkPos.x -= Chunk::worldWidth;
+
+            for (int z = 0; z < width; z++)
+                delete GetChunk(width - 1, z);
+
+            for (int x = width - 2; x >= 0; x--)
+            {
+                for (int z = 0; z < width; z++)
+                {
+                    Chunk* chunk = GetChunk(x, z);
+                    SetChunk(chunk, x + 1, z);
+                }
+            }
+
+            for (int z = 0; z < width; z++)
+            {
+                Chunk* chunk = new Chunk;
+                SetChunk(chunk, 0, z);
+
+                glm::vec2 pos;
+                pos.x = m_centerChunkPos.x;
+                pos.y = m_centerChunkPos.z + Chunk::worldWidth * (z);
+
+                m_loadQueue.push({ chunk, pos });
+                //PerlinTerrain(chunk, pos);
+            }
+        }
+
+        void UpdateCameraForward()
+        {
+            m_centerChunkPos.z += Chunk::worldWidth;
+
+            for (int x = 0; x < width; x++)
+                delete GetChunk(x, 0);
+
+            for (int z = 1; z < width; z++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Chunk* chunk = GetChunk(x, z);
+                    SetChunk(chunk, x, z - 1);
+                }
+            }
+
+            for (int x = 0; x < width; x++)
+            {
+                Chunk* chunk = new Chunk;
+                SetChunk(chunk, x, width - 1);
+
+                glm::vec2 pos;
+                pos.x = m_centerChunkPos.x + Chunk::worldWidth * x;
+                pos.y = m_centerChunkPos.z + Chunk::worldWidth * (width - 1);
+
+                m_loadQueue.push({ chunk, pos });
+                //PerlinTerrain(chunk, pos);
+            }
+        }
+
+        void UpdateCameraBackward()
+        {
+            m_centerChunkPos.z -= Chunk::worldWidth;
+
+            for (int x = 0; x < width; x++)
+                delete GetChunk(x, width - 1);
+
+            for (int z = width - 2; z >= 0; z--)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Chunk* chunk = GetChunk(x, z);
+                    SetChunk(chunk, x, z + 1);
+                }
+            }
+
+            for (int x = 0; x < width; x++)
+            {
+                Chunk* chunk = new Chunk;
+                SetChunk(chunk, x, 0);
+
+                glm::vec2 pos;
+                pos.x = m_centerChunkPos.x + Chunk::worldWidth * x;
+                pos.y = m_centerChunkPos.z;
+
+                m_loadQueue.push({ chunk, pos });
+                //PerlinTerrain(chunk, pos);
+            }
+        }
+
         void UpdateCameraPos(const glm::vec3& camPos)
         {
             constexpr float chunkUpdateWidth = Chunk::worldWidth / 1.7f;
 
-            using Clock = std::chrono::high_resolution_clock;
-            auto startTime = Clock::now();
-            bool chunksUpdated = false;
-
             if (camPos.x > m_centerChunkPos.x + chunkUpdateWidth)
             {
-                chunksUpdated = true;
-                m_centerChunkPos.x += Chunk::worldWidth;
-                
-                for (int z = 0; z < width; z++)
-                    delete GetChunk(0, z);
-
-                for (int x = 1; x < width; x++)
-                {
-                    for (int z = 0; z < width; z++)
-                    {
-                        Chunk* chunk = GetChunk(x, z);
-                        SetChunk(chunk, x - 1, z);
-                    }
-                }
-
-                for (int z = 0; z < width; z++)
-                {
-                    Chunk* chunk = new Chunk;
-                    SetChunk(chunk, width - 1, z);
-
-                    glm::vec2 pos;
-                    pos.x = m_centerChunkPos.x + Chunk::worldWidth * (width - 1);
-                    pos.y = m_centerChunkPos.z + Chunk::worldWidth * (z);
-
-                    PerlinTerrain(chunk, pos);
-                }
-
+                UpdateCameraRight();
             }
             else if (camPos.x < m_centerChunkPos.x - chunkUpdateWidth)
             {
-                chunksUpdated = true;
-                m_centerChunkPos.x -= Chunk::worldWidth;
-
-                for (int z = 0; z < width; z++)
-                    delete GetChunk(width - 1, z);
-
-                for (int x = width - 2; x >= 0; x--)
-                {
-                    for (int z = 0; z < width; z++)
-                    {
-                        Chunk* chunk = GetChunk(x, z);
-                        SetChunk(chunk, x + 1, z);
-                    }
-                }
-
-                for (int z = 0; z < width; z++)
-                {
-                    Chunk* chunk = new Chunk;
-                    SetChunk(chunk, 0, z);
-
-                    glm::vec2 pos;
-                    pos.x = m_centerChunkPos.x;
-                    pos.y = m_centerChunkPos.z + Chunk::worldWidth * (z);
-
-                    PerlinTerrain(chunk, pos);
-                }
+                UpdateCameraLeft();
             }
             else if (camPos.z > m_centerChunkPos.z + chunkUpdateWidth)
             {
-                chunksUpdated = true;
-                m_centerChunkPos.z += Chunk::worldWidth;
-
-                for (int x = 0; x < width; x++)
-                    delete GetChunk(x, 0);
-
-                for (int z = 1; z < width; z++)
-                {
-                    for (int x = 0; x < width; x++)
-                    {
-                        Chunk* chunk = GetChunk(x, z);
-                        SetChunk(chunk, x, z - 1);
-                    }
-                }
-
-                for (int x = 0; x < width; x++)
-                {
-                    Chunk* chunk = new Chunk;
-                    SetChunk(chunk, x, width - 1);
-
-                    glm::vec2 pos;
-                    pos.x = m_centerChunkPos.x + Chunk::worldWidth * x;
-                    pos.y = m_centerChunkPos.z + Chunk::worldWidth * (width - 1);
-
-                    PerlinTerrain(chunk, pos);
-                }
-                
+                UpdateCameraForward();
             }
             else if (camPos.z < m_centerChunkPos.z - chunkUpdateWidth)
             {
-                chunksUpdated = true;
-                m_centerChunkPos.z -= Chunk::worldWidth;
-                
-                for (int x = 0; x < width; x++)
-                    delete GetChunk(x, width - 1);
-
-                for (int z = width - 2; z >= 0; z--)
-                {
-                    for (int x = 0; x < width; x++)
-                    {
-                        Chunk* chunk = GetChunk(x, z);
-                        SetChunk(chunk, x, z + 1);
-                    }
-                }
-
-                for (int x = 0; x < width; x++)
-                {
-                    Chunk* chunk = new Chunk;
-                    SetChunk(chunk, x, 0);
-
-                    glm::vec2 pos;
-                    pos.x = m_centerChunkPos.x + Chunk::worldWidth * x;
-                    pos.y = m_centerChunkPos.z;
-
-                    PerlinTerrain(chunk, pos);
-                }
+                UpdateCameraBackward();
             }
 
-            if (chunksUpdated)
+            //while (m_loadQueue.empty() == false)
+            if (m_loadQueue.empty() == false)
             {
-                float ftime = std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - startTime).count() / 1000.0f;
-                std::cout << "chunk manager updated chunks (" << ftime << "ms)\n";
+                LoadItem& loadItem = m_loadQueue.front();
+
+                PerlinTerrain(loadItem.chunk, loadItem.pos);
+
+                m_loadQueue.pop();
             }
         }
 
