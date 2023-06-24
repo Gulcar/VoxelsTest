@@ -17,7 +17,7 @@ namespace voxr
         Chunk* GetChunk(int x, int z);
         void SetChunk(Chunk* chunk, int x, int z);
 
-        inline constexpr int width = 5;
+        inline constexpr int width = 7;
     }
 
 }

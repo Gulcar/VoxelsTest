@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <noise/noise.h>
 #include "VoxelRenderer.h"
+#include <chrono>
+#include <iostream>
 
 namespace
 {
@@ -82,8 +84,13 @@ namespace voxr
         {
             constexpr float chunkUpdateWidth = Chunk::worldWidth / 1.7f;
 
+            using Clock = std::chrono::high_resolution_clock;
+            auto startTime = Clock::now();
+            bool chunksUpdated = false;
+
             if (camPos.x > m_centerChunkPos.x + chunkUpdateWidth)
             {
+                chunksUpdated = true;
                 m_centerChunkPos.x += Chunk::worldWidth;
                 
                 for (int z = 0; z < width; z++)
@@ -113,6 +120,7 @@ namespace voxr
             }
             else if (camPos.x < m_centerChunkPos.x - chunkUpdateWidth)
             {
+                chunksUpdated = true;
                 m_centerChunkPos.x -= Chunk::worldWidth;
 
                 for (int z = 0; z < width; z++)
@@ -141,6 +149,7 @@ namespace voxr
             }
             else if (camPos.z > m_centerChunkPos.z + chunkUpdateWidth)
             {
+                chunksUpdated = true;
                 m_centerChunkPos.z += Chunk::worldWidth;
 
                 for (int x = 0; x < width; x++)
@@ -170,6 +179,7 @@ namespace voxr
             }
             else if (camPos.z < m_centerChunkPos.z - chunkUpdateWidth)
             {
+                chunksUpdated = true;
                 m_centerChunkPos.z -= Chunk::worldWidth;
                 
                 for (int x = 0; x < width; x++)
@@ -195,6 +205,12 @@ namespace voxr
 
                     PerlinTerrain(chunk, pos);
                 }
+            }
+
+            if (chunksUpdated)
+            {
+                float ftime = std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - startTime).count() / 1000.0f;
+                std::cout << "chunk manager updated chunks (" << ftime << "ms)\n";
             }
         }
 
