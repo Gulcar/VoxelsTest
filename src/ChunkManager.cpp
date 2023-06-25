@@ -269,9 +269,11 @@ namespace voxr
                     glm::vec3 pos = glm::vec3(Chunk::worldWidth * x, 0.0f, Chunk::worldWidth * z);
                     pos.x -= ChunkManager::width / 2 * Chunk::worldWidth;
                     pos.z -= ChunkManager::width / 2 * Chunk::worldWidth;
+                    pos += glm::vec3(1.0f / 16.0f / 2.0f);
                     pos += m_centerChunkPos;
 
-                    voxr::DrawChunk(*chunk, pos);
+                    if (voxr::IsChunkInView(chunk, pos))
+                        voxr::DrawChunk(*chunk, pos);
                 }
             }
         }

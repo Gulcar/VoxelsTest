@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
     src/VoxelRenderer.cpp
     src/Chunk.cpp
     src/ChunkManager.cpp
+    src/FrustumCulling.cpp
 
     deps/glad-3.3-khrdebug/src/glad.c
 )

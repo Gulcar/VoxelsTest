@@ -23,10 +23,16 @@ namespace
     glm::vec3 m_camRight = {};
 
     glm::mat4 m_viewProj;
+    glm::mat4 m_otherViewProj;
 
     bool m_mouseEnabled = true;
     glm::dvec2 m_prevMousePos;
     bool m_lineMode = false;
+
+    uint32_t m_lineVao;
+    uint32_t m_lineVbo;
+    glm::vec3 m_lineDrawBuffer[64];
+    uint32_t m_lineDrawIndex = 0;
 
     constexpr float m_moveSpeed = 2.0f;
     constexpr float m_sprintSpeedMult = 2.5f;
@@ -48,6 +54,10 @@ namespace
         glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)m_windowSize.x / m_windowSize.y, 0.01f, 100.0f);
 
         m_viewProj = projection * view;
+
+        glm::mat4 oview = glm::lookAt(glm::vec3(0, 50, 0), glm::vec3(0, 0, -0.1f), glm::vec3(0, 1, 0));
+        //glm::mat4 oview = glm::lookAt(glm::vec3(2, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        m_otherViewProj = projection * oview;
     }
 
     void OnGlfwKey(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -188,6 +198,18 @@ namespace voxr
 
         //
 
+        glGenVertexArrays(1, &m_lineVao);
+        glBindVertexArray(m_lineVao);
+
+        glGenBuffers(1, &m_lineVbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_lineVbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(m_lineDrawBuffer), nullptr, GL_DYNAMIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(sizeof(float) * 0));
+
+        //
+
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
@@ -250,7 +272,10 @@ namespace voxr
             m_camRot.y = glm::clamp(m_camRot.y, -PI / 2.1f, PI / 2.1f);
         }
 
+
         CalcViewProjMat();
+
+        UpdateCameraFrustum(m_camPos, m_camForward, m_camRight, 0.01f, 25.0f, (float)m_windowSize.x / m_windowSize.y);
     }
 
     const glm::vec3& GetCameraPos()
@@ -258,8 +283,15 @@ namespace voxr
         return m_camPos;
     }
 
+    const glm::vec3& GetCameraForward()
+    {
+        return m_camForward;
+    }
+
     void DrawCube(const glm::vec3& pos, const glm::vec3 color)
     {
+        glViewport(m_windowSize.x / 3, m_windowSize.y / 3, m_windowSize.x * 2 / 3, m_windowSize.y * 2 / 3);
+
         glm::mat4 model(1.0f);
         model = glm::translate(model, pos);
         model = glm::scale(model, glm::vec3(1.0f / 16.0f));
@@ -275,6 +307,13 @@ namespace voxr
 
         glBindVertexArray(m_cubeVao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glViewport(0, 0, m_windowSize.x / 3, m_windowSize.y / 3);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_otherViewProj[0][0]);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        glViewport(0, 0, m_windowSize.x, m_windowSize.y);
     }
 
     void DrawText(std::string_view text, glm::vec2 pos)
@@ -306,6 +345,8 @@ namespace voxr
 
     void DrawChunk(const Chunk& chunk, const glm::vec3& pos)
     {
+        glViewport(m_windowSize.x / 3, m_windowSize.y / 3, m_windowSize.x * 2 / 3, m_windowSize.y * 2 / 3);
+
         glm::mat4 model(1.0f);
         model = glm::translate(model, pos);
 
@@ -321,6 +362,50 @@ namespace voxr
         glBindVertexArray(chunk.GetVao());
         glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());
 
+
+        glViewport(0, 0, m_windowSize.x / 3, m_windowSize.y / 3);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_otherViewProj[0][0]);
+        glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());
+
+
+        glViewport(0, 0, m_windowSize.x, m_windowSize.y);
+    }
+
+    void DrawLine(const glm::vec3& a, const glm::vec3& b)
+    {
+        m_lineDrawBuffer[m_lineDrawIndex] = a;
+        m_lineDrawBuffer[m_lineDrawIndex + 1] = b;
+        m_lineDrawIndex += 2;
+
+        if (m_lineDrawIndex == (sizeof(m_lineDrawBuffer) / sizeof(m_lineDrawBuffer[0])))
+            SubmitDrawLines();
+    }
+    
+    void SubmitDrawLines()
+    {
+        if (m_lineDrawIndex == 0)
+            return;
+
+        glBindVertexArray(m_lineVao);
+        glBindBuffer(GL_ARRAY_BUFFER, m_lineVbo);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * m_lineDrawIndex, m_lineDrawBuffer);
+
+        glm::mat4 model(1.0f);
+
+        glUseProgram(m_shaderProgram);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
+        glUniform3fv(glGetUniformLocation(m_shaderProgram, "uCameraPos"), 1, &m_camPos[0]);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_viewProj[0][0]);
+
+        glViewport(m_windowSize.x / 3, m_windowSize.y / 3, m_windowSize.x * 2 / 3, m_windowSize.y * 2 / 3);
+        glDrawArrays(GL_LINES, 0, m_lineDrawIndex);
+
+        glViewport(0, 0, m_windowSize.x / 3, m_windowSize.y / 3);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_otherViewProj[0][0]);
+        glDrawArrays(GL_LINES, 0, m_lineDrawIndex);
+
+        m_lineDrawIndex = 0;
+        glViewport(0, 0, m_windowSize.x, m_windowSize.y);
     }
 
     uint32_t LoadShader(std::string_view source, GLenum type)
