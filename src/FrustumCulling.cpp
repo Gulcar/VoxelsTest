@@ -8,7 +8,7 @@ namespace
     struct Plane
     {
         glm::vec3 normal;
-        float dist; // koliko normal da pridemo do 0,0,0
+        float dist; // dist je koliko normal da pridemo do ravnine!!
     };
 
     struct AABB
@@ -49,7 +49,12 @@ namespace voxr
         aabb.extents = glm::vec3(Chunk::worldWidth / 2.0f);
 
         if (
-            IsAABBInPlane(aabb, m_nearPlane) 
+            IsAABBInPlane(aabb, m_nearPlane) &&
+            IsAABBInPlane(aabb, m_leftPlane) &&
+            IsAABBInPlane(aabb, m_rightPlane) &&
+            IsAABBInPlane(aabb, m_bottomPlane) &&
+            IsAABBInPlane(aabb, m_topPlane) &&
+            IsAABBInPlane(aabb, m_farPlane)
         )
             return true;
 
@@ -61,10 +66,11 @@ namespace voxr
     {
         glm::vec3 camUp = glm::cross(camRight, camForward);
 
-        float nearHeight = glm::tan(glm::radians(60.0f)) * zNear * 2.0f;
+        // fakfchaslfha nigagaga  tukaj moras kot deliti z 2 !!!!!
+        float nearHeight = glm::tan(glm::radians(60.0f) / 2.0f) * zNear * 2.0f;
         float nearWidth = nearHeight * aspect;
 
-        float farHeight = glm::tan(glm::radians(60.0f)) * zFar * 2.0f;
+        float farHeight = glm::tan(glm::radians(60.0f) / 2.0f) * zFar * 2.0f;
         float farWidth = farHeight * aspect;
 
         glm::vec3 nearCenter = camPos + camForward * zNear;
@@ -89,16 +95,17 @@ namespace voxr
         m_farPlane.dist = glm::dot(camPos + camForward * zFar, -camForward);
 
         m_leftPlane.normal = glm::normalize(glm::cross(farLeft - nearTopLeft, farLeft - nearBottomLeft));
-        m_leftPlane.dist = glm::dot(-nearBottomLeft, m_leftPlane.normal);
+        // dist je koliko normal da pridemo do ravnine!!
+        m_leftPlane.dist = glm::dot(nearBottomLeft, m_leftPlane.normal);
 
         m_rightPlane.normal = glm::normalize(glm::cross(farRight - nearBottomRight, farRight - nearTopRight));
-        m_rightPlane.dist = glm::dot(-nearBottomRight, m_rightPlane.normal);
+        m_rightPlane.dist = glm::dot(nearBottomRight, m_rightPlane.normal);
 
         m_topPlane.normal = glm::normalize(glm::cross(farTop - nearTopRight, farTop - nearTopLeft));
-        m_topPlane.dist = glm::dot(-nearTopLeft, m_topPlane.normal);
+        m_topPlane.dist = glm::dot(nearTopLeft, m_topPlane.normal);
 
         m_bottomPlane.normal = glm::normalize(glm::cross(farBottom - nearBottomLeft, farBottom - nearBottomRight));
-        m_bottomPlane.dist = glm::dot(-nearBottomRight, m_bottomPlane.normal);
+        m_bottomPlane.dist = glm::dot(nearBottomRight, m_bottomPlane.normal);
 
 
         glm::vec3 farTopLeft = farLeft + camUp * farHeight / 2.0f;
