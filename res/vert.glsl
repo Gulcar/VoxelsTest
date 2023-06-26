@@ -8,9 +8,12 @@ uniform mat4 uModel;
 uniform mat4 uViewProj;
 uniform mat3 uNormalMat;
 
+uniform mat4 uShadowViewProj;
+
 out vec3 FragCoord;
 out vec3 Normal;
 out vec3 Color;
+out vec4 FragShadowCoord;
 
 void main()
 {
@@ -29,6 +32,7 @@ void main()
     FragCoord = (uModel * vec4(aPos, 1.0)).xyz;
     Normal = uNormalMat * normal;
     Color = aColor / 255.0f;
+    FragShadowCoord = uShadowViewProj * vec4(FragCoord, 1.0);
 
     gl_Position = uViewProj * uModel * vec4(aPos, 1.0);
 }

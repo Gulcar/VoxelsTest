@@ -23,6 +23,8 @@ int main()
         voxr::UpdateCamera(deltaTime);
         voxr::ChunkManager::UpdateCameraPos(voxr::GetCameraPos());
 
+        voxr::ShadowPass();
+
         glClearColor(0.471f, 0.831f, 0.941f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -31,6 +31,8 @@ namespace voxr
     void DrawLine(const glm::vec3& a, const glm::vec3& b);
     void SubmitDrawLines();
 
+    void ShadowPass();
+
     uint32_t LoadShader(std::string_view source, GLenum type);
     uint32_t LoadShaderProgram(const char* vertShaderFile, const char* fragShaderFile);
 }

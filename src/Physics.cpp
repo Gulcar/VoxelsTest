@@ -90,6 +90,7 @@ namespace voxr::Physics
         return didHit;
     }
 
+    // https://medium.com/@bromanz/another-view-on-the-classic-ray-aabb-intersection-algorithm-for-bvh-traversal-41125138b525
     bool RayAABBIntersection(const Ray& ray, const AABB& aabb, float tmax, float* t)
     {
         glm::vec3 invD = 1.0f / ray.dir;

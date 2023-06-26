@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #define GLT_IMPLEMENTATION
 #include <glText/gltext.h>
+#include "ChunkManager.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -33,6 +34,12 @@ namespace
     uint32_t m_lineVbo;
     glm::vec3 m_lineDrawBuffer[64];
     uint32_t m_lineDrawIndex = 0;
+
+    uint32_t m_shadowFbo;
+    uint32_t m_shadowTexture;
+    uint32_t m_shadowShaderProgram;
+    glm::mat4 m_shadowViewProj;
+    constexpr int m_shadowMapSize = 8192;
 
     constexpr float m_moveSpeed = 2.0f;
     constexpr float m_sprintSpeedMult = 2.5f;
@@ -122,6 +129,7 @@ namespace voxr
         std::cout << glGetString(GL_VERSION) << "\n";
 
         m_shaderProgram = LoadShaderProgram("res/vert.glsl", "res/frag.glsl");
+        m_shadowShaderProgram = LoadShaderProgram("res/shadowVert.glsl", "res/shadowFrag.glsl");
 
         gltInit();
 
@@ -207,6 +215,28 @@ namespace voxr
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)(sizeof(float) * 0));
+
+        //
+
+        glGenFramebuffers(1, &m_shadowFbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFbo);
+
+        glGenTextures(1, &m_shadowTexture);
+        glBindTexture(GL_TEXTURE_2D, m_shadowTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowTexture, 0);
+        glDrawBuffer(GL_NONE); // oboje na none ker ta framebuffer ne bo imel barv
+        glReadBuffer(GL_NONE);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "Failed to create shadow map framebuffer!\n";
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         //
 
@@ -305,6 +335,8 @@ namespace voxr
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_viewProj[0][0]);
         glUniformMatrix3fv(glGetUniformLocation(m_shaderProgram, "uNormalMat"), 1, GL_FALSE, &normalMat[0][0]);
         glUniform3fv(glGetUniformLocation(m_shaderProgram, "uCameraPos"), 1, &m_camPos[0]);
+        glBindTexture(GL_TEXTURE_2D, m_shadowTexture);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uShadowViewProj"), 1, GL_FALSE, &m_shadowViewProj[0][0]);
 
         glBindVertexArray(m_cubeVao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -363,6 +395,8 @@ namespace voxr
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_viewProj[0][0]);
         glUniformMatrix3fv(glGetUniformLocation(m_shaderProgram, "uNormalMat"), 1, GL_FALSE, &normalMat[0][0]);
         glUniform3fv(glGetUniformLocation(m_shaderProgram, "uCameraPos"), 1, &m_camPos[0]);
+        glBindTexture(GL_TEXTURE_2D, m_shadowTexture);
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uShadowViewProj"), 1, GL_FALSE, &m_shadowViewProj[0][0]);
 
         glBindVertexArray(chunk.GetVao());
         glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());
@@ -417,6 +451,47 @@ namespace voxr
 #endif
 
         m_lineDrawIndex = 0;
+    }
+
+    void ShadowPass()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFbo);
+        glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        constexpr glm::vec3 lightDir = glm::vec3(0.5f, -1.5f, -0.7f); // isto kot v shaderju
+        glm::vec3 camGroundPos = glm::vec3(m_camPos.x, 0.0f, m_camPos.z);
+
+        glm::mat4 view = glm::lookAt(camGroundPos - lightDir * 10.0f, camGroundPos, glm::vec3(0, 1, 0));
+        glm::mat4 proj = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 50.0f);
+        m_shadowViewProj = proj * view;
+
+        glUseProgram(m_shadowShaderProgram);
+        glUniformMatrix4fv(glGetUniformLocation(m_shadowShaderProgram, "uViewProj"), 1, GL_FALSE, &m_shadowViewProj[0][0]);
+
+        for (int z = 0; z < ChunkManager::width; z++)
+        {
+            for (int x = 0; x < ChunkManager::width; x++)
+            {
+                Chunk* chunk = ChunkManager::GetChunk(x, z);
+                glm::vec3 pos = glm::vec3(Chunk::worldWidth * x, 0.0f, Chunk::worldWidth * z);
+                pos.x -= ChunkManager::width / 2 * Chunk::worldWidth;
+                pos.z -= ChunkManager::width / 2 * Chunk::worldWidth;
+                pos += glm::vec3(1.0f / 16.0f / 2.0f);
+                pos += ChunkManager::GetCenterChunkPos();
+
+                glm::mat4 model(1.0f);
+                model = glm::translate(model, pos);
+
+                glUniformMatrix4fv(glGetUniformLocation(m_shadowShaderProgram, "uModel"), 1, GL_FALSE, &model[0][0]);
+
+                glBindVertexArray(chunk->GetVao());
+                glDrawArrays(GL_TRIANGLES, 0, chunk->GetNumVertices());
+            }
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, m_windowSize.x, m_windowSize.y);
     }
 
     uint32_t LoadShader(std::string_view source, GLenum type)
