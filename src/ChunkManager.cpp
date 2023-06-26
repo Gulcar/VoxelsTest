@@ -293,6 +293,11 @@ namespace voxr
 
             m_chunks[z][x] = chunk;
         }
+
+        const glm::vec3& GetCenterChunkPos()
+        {
+            return m_centerChunkPos;
+        }
     }
 
 }

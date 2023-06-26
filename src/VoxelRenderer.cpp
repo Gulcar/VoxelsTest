@@ -23,7 +23,7 @@ namespace
     glm::vec3 m_camRight = {};
 
     glm::mat4 m_viewProj;
-    glm::mat4 m_otherViewProj;
+    glm::mat4 m_otherViewProj; // ce je USE_DEBUG_CAMERA
 
     bool m_mouseEnabled = true;
     glm::dvec2 m_prevMousePos;
@@ -290,8 +290,9 @@ namespace voxr
 
     void DrawCube(const glm::vec3& pos, const glm::vec3 color)
     {
+#if USE_DEBUG_CAMERA
         glViewport(m_windowSize.x / 3, m_windowSize.y / 3, m_windowSize.x * 2 / 3, m_windowSize.y * 2 / 3);
-
+#endif
         glm::mat4 model(1.0f);
         model = glm::translate(model, pos);
         model = glm::scale(model, glm::vec3(1.0f / 16.0f));
@@ -308,12 +309,14 @@ namespace voxr
         glBindVertexArray(m_cubeVao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+#if USE_DEBUG_CAMERA
         glViewport(0, 0, m_windowSize.x / 3, m_windowSize.y / 3);
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_otherViewProj[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
         glViewport(0, 0, m_windowSize.x, m_windowSize.y);
+#endif
     }
 
     void DrawText(std::string_view text, glm::vec2 pos)
@@ -345,7 +348,9 @@ namespace voxr
 
     void DrawChunk(const Chunk& chunk, const glm::vec3& pos)
     {
+#if USE_DEBUG_CAMERA
         glViewport(m_windowSize.x / 3, m_windowSize.y / 3, m_windowSize.x * 2 / 3, m_windowSize.y * 2 / 3);
+#endif
 
         glm::mat4 model(1.0f);
         model = glm::translate(model, pos);
@@ -362,13 +367,13 @@ namespace voxr
         glBindVertexArray(chunk.GetVao());
         glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());
 
-
+#if USE_DEBUG_CAMERA
         glViewport(0, 0, m_windowSize.x / 3, m_windowSize.y / 3);
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_otherViewProj[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, chunk.GetNumVertices());
 
-
         glViewport(0, 0, m_windowSize.x, m_windowSize.y);
+#endif
     }
 
     void DrawLine(const glm::vec3& a, const glm::vec3& b)
@@ -397,15 +402,21 @@ namespace voxr
         glUniform3fv(glGetUniformLocation(m_shaderProgram, "uCameraPos"), 1, &m_camPos[0]);
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_viewProj[0][0]);
 
+#if USE_DEBUG_CAMERA
         glViewport(m_windowSize.x / 3, m_windowSize.y / 3, m_windowSize.x * 2 / 3, m_windowSize.y * 2 / 3);
+#endif
+
         glDrawArrays(GL_LINES, 0, m_lineDrawIndex);
 
+#if USE_DEBUG_CAMERA
         glViewport(0, 0, m_windowSize.x / 3, m_windowSize.y / 3);
         glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "uViewProj"), 1, GL_FALSE, &m_otherViewProj[0][0]);
         glDrawArrays(GL_LINES, 0, m_lineDrawIndex);
 
-        m_lineDrawIndex = 0;
         glViewport(0, 0, m_windowSize.x, m_windowSize.y);
+#endif
+
+        m_lineDrawIndex = 0;
     }
 
     uint32_t LoadShader(std::string_view source, GLenum type)

@@ -17,6 +17,8 @@ namespace voxr
         Chunk* GetChunk(int x, int z);
         void SetChunk(Chunk* chunk, int x, int z);
 
+        const glm::vec3& GetCenterChunkPos();
+
         inline constexpr int width = 11;
     }
 

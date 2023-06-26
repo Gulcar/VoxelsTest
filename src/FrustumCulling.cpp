@@ -107,7 +107,7 @@ namespace voxr
         m_bottomPlane.normal = glm::normalize(glm::cross(farBottom - nearBottomLeft, farBottom - nearBottomRight));
         m_bottomPlane.dist = glm::dot(nearBottomRight, m_bottomPlane.normal);
 
-
+#if USE_DEBUG_CAMERA
         glm::vec3 farTopLeft = farLeft + camUp * farHeight / 2.0f;
         glm::vec3 farTopRight = farRight + camUp * farHeight / 2.0f;
         glm::vec3 farBottomLeft = farTopLeft - camUp * farHeight;
@@ -126,5 +126,6 @@ namespace voxr
         voxr::DrawLine(camPos, camPos + camUp);
         voxr::DrawLine(camPos, camPos + camForward / 2.0f);
         voxr::DrawLine(camPos, camPos + camRight / 2.0f);
+#endif
     }
 }

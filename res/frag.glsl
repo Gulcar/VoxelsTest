@@ -10,7 +10,7 @@ uniform vec3 uCameraPos;
 
 const vec3 lightDir = normalize(vec3(0.5, -1.5, -0.7));
 
-const bool fogEnabled = false;
+const bool fogEnabled = true;
 const vec3 fogColor = vec3(0.471, 0.831, 0.941);
 
 vec3 CalculateFog(vec3 color)

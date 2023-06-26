@@ -1,6 +1,7 @@
 #include <iostream>
 #include "VoxelRenderer.h"
 #include "ChunkManager.h"
+#include "Physics.h"
 
 int main()
 {
@@ -35,6 +36,16 @@ int main()
         voxr::DrawTextF("%.3fms", glm::vec2(0.0f, 30.0f), deltaTime * 1000.0f);
 
         voxr::SubmitDrawLines();
+
+        voxr::Physics::Ray ray;
+        ray.origin = voxr::GetCameraPos();
+        ray.dir = voxr::GetCameraForward();
+
+        voxr::Physics::HitResult hit;
+        if (voxr::Physics::Raycast(ray, &hit))
+        {
+            voxr::DrawCube(hit.pos + glm::vec3(0, 1.0f / 16.0f, 0));
+        }
 
         glfwSwapBuffers(voxr::GetWindow());
     }

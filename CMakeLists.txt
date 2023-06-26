@@ -8,6 +8,7 @@ add_executable(${PROJECT_NAME}
     src/Chunk.cpp
     src/ChunkManager.cpp
     src/FrustumCulling.cpp
+    src/Physics.cpp
 
     deps/glad-3.3-khrdebug/src/glad.c
 )

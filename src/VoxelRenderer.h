@@ -12,6 +12,8 @@
 
 constexpr auto PI = 3.14159265359f;
 
+#define USE_DEBUG_CAMERA 0
+
 namespace voxr
 {
     void CreateWindow(const char* title, int width, int height);
