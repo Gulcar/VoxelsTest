@@ -1,7 +1,7 @@
 #include "FrustumCulling.h"
 #include "VoxelRenderer.h"
 #include <glm/glm.hpp>
-#include <vector>
+#include <array>
 
 namespace
 {
@@ -24,8 +24,7 @@ namespace
     Plane m_topPlane;
     Plane m_bottomPlane;
 
-    uint32_t m_vao, m_vbo;
-    glm::vec3 m_drawBuffer[35];
+    std::array<glm::vec3, 8> m_corners;
 
     // ali je aabb na pozitivni strani ravnine
     bool IsAABBInPlane(const AABB& aabb, const Plane& plane)
@@ -107,12 +106,21 @@ namespace voxr
         m_bottomPlane.normal = glm::normalize(glm::cross(farBottom - nearBottomLeft, farBottom - nearBottomRight));
         m_bottomPlane.dist = glm::dot(nearBottomRight, m_bottomPlane.normal);
 
-#if USE_DEBUG_CAMERA
         glm::vec3 farTopLeft = farLeft + camUp * farHeight / 2.0f;
         glm::vec3 farTopRight = farRight + camUp * farHeight / 2.0f;
         glm::vec3 farBottomLeft = farTopLeft - camUp * farHeight;
         glm::vec3 farBottomRight = farTopRight - camUp * farHeight;
+
+        m_corners[0] = nearBottomLeft;
+        m_corners[1] = nearBottomRight;
+        m_corners[2] = nearTopLeft;
+        m_corners[3] = nearTopRight;
+        m_corners[4] = farBottomLeft;
+        m_corners[5] = farBottomRight;
+        m_corners[6] = farTopLeft;
+        m_corners[7] = farTopRight;
         
+#if USE_DEBUG_CAMERA
         voxr::DrawLine(nearTopLeft, farTopLeft);
         voxr::DrawLine(nearTopRight, farTopRight);
         voxr::DrawLine(nearBottomLeft, farBottomLeft);
@@ -127,5 +135,10 @@ namespace voxr
         voxr::DrawLine(camPos, camPos + camForward / 2.0f);
         voxr::DrawLine(camPos, camPos + camRight / 2.0f);
 #endif
+    }
+
+    const std::array<glm::vec3, 8>& GetCamFrustumCorners()
+    {
+        return m_corners;
     }
 }

@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdarg.h>
+#include <limits>
 
 // anonymous namespace
 namespace
@@ -459,11 +460,55 @@ namespace voxr
         glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        constexpr glm::vec3 lightDir = glm::vec3(0.5f, -1.5f, -0.7f); // isto kot v shaderju
-        glm::vec3 camGroundPos = glm::vec3(m_camPos.x, 0.0f, m_camPos.z);
+        // https://learnopengl.com/Guest-Articles/2021/CSM
 
-        glm::mat4 view = glm::lookAt(camGroundPos - lightDir * 10.0f, camGroundPos, glm::vec3(0, 1, 0));
-        glm::mat4 proj = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 50.0f);
+        std::array<glm::vec3, 8> frustumCorners = voxr::GetCamFrustumCorners();
+
+        for (int i = 4; i < 8; i++)
+        {
+            const glm::vec3& near = frustumCorners[i - 4];
+            const glm::vec3& far = frustumCorners[i];
+            
+            constexpr float shadowDistance = 6.0f;
+
+            frustumCorners[i] = glm::normalize(far - near) * shadowDistance + near;
+        }
+
+        glm::vec3 frustumCenter = {};
+        for (const auto& p : frustumCorners)
+            frustumCenter += p;
+        frustumCenter /= (float)frustumCorners.size();
+        frustumCenter.y = 0.0f;
+
+        constexpr glm::vec3 lightDir = glm::vec3(0.5f, -1.5f, -0.7f); // isto kot v shaderju
+        glm::mat4 view = glm::lookAt(frustumCenter - lightDir * 10.0f, frustumCenter, glm::vec3(0, 1, 0));
+
+        float minX = std::numeric_limits<float>::max();
+        float maxX = std::numeric_limits<float>::lowest();
+        float minY = std::numeric_limits<float>::max();
+        float maxY = std::numeric_limits<float>::lowest();
+
+        float worldMinX = std::numeric_limits<float>::max();
+        float worldMaxX = std::numeric_limits<float>::lowest();
+        float worldMinZ = std::numeric_limits<float>::max();
+        float worldMaxZ = std::numeric_limits<float>::lowest();
+
+        for (const auto& c : frustumCorners)
+        {
+            glm::vec4 p = view * glm::vec4(c, 1.0);
+
+            minX = glm::min(minX, p.x);
+            maxX = glm::max(maxX, p.x);
+            minY = glm::min(minY, p.y);
+            maxY = glm::max(maxY, p.y);
+
+            worldMinX = glm::min(worldMinX, c.x);
+            worldMaxX = glm::max(worldMaxX, c.x);
+            worldMinZ = glm::min(worldMinZ, c.z);
+            worldMaxZ = glm::max(worldMaxZ, c.z);
+        }
+
+        glm::mat4 proj = glm::ortho(minX, maxX, minY, maxY, 1.0f, 50.0f);
         m_shadowViewProj = proj * view;
 
         glUseProgram(m_shadowShaderProgram);
@@ -473,12 +518,21 @@ namespace voxr
         {
             for (int x = 0; x < ChunkManager::width; x++)
             {
-                Chunk* chunk = ChunkManager::GetChunk(x, z);
                 glm::vec3 pos = glm::vec3(Chunk::worldWidth * x, 0.0f, Chunk::worldWidth * z);
                 pos.x -= ChunkManager::width / 2 * Chunk::worldWidth;
                 pos.z -= ChunkManager::width / 2 * Chunk::worldWidth;
                 pos += glm::vec3(1.0f / 16.0f / 2.0f);
                 pos += ChunkManager::GetCenterChunkPos();
+
+                if (pos.x + Chunk::worldWidth / 2.0f < worldMinX ||
+                    pos.x - Chunk::worldWidth / 2.0f > worldMaxX ||
+                    pos.z + Chunk::worldWidth / 2.0f < worldMinZ ||
+                    pos.z - Chunk::worldWidth / 2.0f > worldMaxZ)
+                {
+                    continue;
+                }
+
+                Chunk* chunk = ChunkManager::GetChunk(x, z);
 
                 glm::mat4 model(1.0f);
                 model = glm::translate(model, pos);

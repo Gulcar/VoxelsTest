@@ -11,7 +11,7 @@ uniform vec3 uCameraPos;
 uniform sampler2D uShadowMap;
 
 const vec3 lightDir = normalize(vec3(0.5, -1.5, -0.7));
-const float shadowBias = 0.0004;
+const float shadowBias = 0.0002;
 
 const bool fogEnabled = true;
 const vec3 fogColor = vec3(0.471, 0.831, 0.941);

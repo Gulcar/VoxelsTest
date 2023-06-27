@@ -2,6 +2,7 @@
 
 #include "Chunk.h"
 #include <glm/vec3.hpp>
+#include <array>
 
 namespace voxr
 {
@@ -9,4 +10,6 @@ namespace voxr
 
     void UpdateCameraFrustum(const glm::vec3& camPos, const glm::vec3& camForward,
         const glm::vec3& camRight, float zNear, float zFar, float aspect);
+
+    const std::array<glm::vec3, 8>& GetCamFrustumCorners();
 }
