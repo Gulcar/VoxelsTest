@@ -10,3 +10,6 @@
 [submodule "deps/libnoise"]
 	path = deps/libnoise
 	url = https://github.com/eXpl0it3r/libnoise
+[submodule "deps/portable-file-dialogs"]
+	path = deps/portable-file-dialogs
+	url = https://github.com/samhocevar/portable-file-dialogs

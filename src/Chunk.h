@@ -42,6 +42,7 @@ public:
 
     inline uint32_t GetVao() const { return m_vao; }
     inline size_t GetNumVertices() const { return m_numVertices; }
+    inline voxr::Voxel* GetData() { return m_voxels; }
 
     void GenerateMesh();
 

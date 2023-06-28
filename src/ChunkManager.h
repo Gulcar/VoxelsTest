@@ -14,10 +14,13 @@ namespace voxr
         void UpdateCameraPos(const glm::vec3& camPos);
         void RenderChunks();
 
+        void FlushLoadQueue();
+
         Chunk* GetChunk(int x, int z);
         void SetChunk(Chunk* chunk, int x, int z);
 
         const glm::vec3& GetCenterChunkPos();
+        void SetCenterChunkPos(const glm::vec3& pos);
 
         inline constexpr int width = 11;
     }

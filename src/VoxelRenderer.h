@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#undef CreateWindow
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
@@ -20,8 +21,12 @@ namespace voxr
     GLFWwindow* GetWindow();
 
     void UpdateCamera(float deltaTime);
-    const glm::vec3& GetCameraPos();
     const glm::vec3& GetCameraForward();
+
+    const glm::vec3& GetCameraPos();
+    void SetCameraPos(const glm::vec3& pos);
+    const glm::vec2& GetCameraRot();
+    void SetCameraRot(const glm::vec2& rot);
 
     void DrawCube(const glm::vec3& pos, const glm::vec3 color = glm::vec3(1.0f));
     void DrawText(std::string_view text, glm::vec2 pos = glm::vec2(0.0f));

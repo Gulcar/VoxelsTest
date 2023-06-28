@@ -251,7 +251,7 @@ namespace voxr
             //while (m_loadQueue.empty() == false)
             if (m_loadQueue.empty() == false)
             {
-                LoadItem& loadItem = m_loadQueue.front();
+                const LoadItem& loadItem = m_loadQueue.front();
 
                 PerlinTerrain(loadItem.chunk, loadItem.pos);
 
@@ -278,6 +278,16 @@ namespace voxr
             }
         }
 
+        void FlushLoadQueue()
+        {
+            while (m_loadQueue.empty() == false)
+            {
+                const LoadItem& loadItem = m_loadQueue.front();
+                PerlinTerrain(loadItem.chunk, loadItem.pos);
+                m_loadQueue.pop_front();
+            }
+        }
+
         Chunk* GetChunk(int x, int z)
         {
             assert(x >= 0 && x < width && "chunk index out of bounds!");
@@ -297,6 +307,11 @@ namespace voxr
         const glm::vec3& GetCenterChunkPos()
         {
             return m_centerChunkPos;
+        }
+
+        void SetCenterChunkPos(const glm::vec3& pos)
+        {
+            m_centerChunkPos = pos;
         }
     }
 

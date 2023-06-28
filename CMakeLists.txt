@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
     src/FrustumCulling.cpp
     src/Physics.cpp
     src/Editing.cpp
+    src/Save.cpp
 
     deps/glad-3.3-khrdebug/src/glad.c
 )

@@ -10,7 +10,7 @@ void HandleVoxelEditing(voxr::Physics::HitResult& hit, float deltaTime)
     static float timeHoldingRight = 0.0f;
     static float timeHoldingLeft = 0.0f;
 
-    constexpr float editsPerSecond = 15.0f;
+    constexpr float editsPerSecond = 17.5f;
 
     if (glfwGetMouseButton(voxr::GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
     {

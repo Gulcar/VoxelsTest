@@ -4,6 +4,7 @@
 #define GLT_IMPLEMENTATION
 #include <glText/gltext.h>
 #include "ChunkManager.h"
+#include "Save.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -82,6 +83,16 @@ namespace
         case GLFW_KEY_ESCAPE:
             glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             m_mouseEnabled = false;
+            break;
+
+        case GLFW_KEY_S:
+            if (mods & GLFW_MOD_CONTROL)
+                voxr::Save::SaveWorld();
+            break;
+
+        case GLFW_KEY_O:
+            if (mods & GLFW_MOD_CONTROL)
+                voxr::Save::OpenWorld();
             break;
         }
     }
@@ -314,9 +325,24 @@ namespace voxr
         return m_camPos;
     }
 
+    void SetCameraPos(const glm::vec3& pos)
+    {
+        m_camPos = pos;
+    }
+
     const glm::vec3& GetCameraForward()
     {
         return m_camForward;
+    }
+
+    const glm::vec2& GetCameraRot()
+    {
+        return m_camRot;
+    }
+
+    void SetCameraRot(const glm::vec2& rot)
+    {
+        m_camRot = rot;
     }
 
     void DrawCube(const glm::vec3& pos, const glm::vec3 color)
