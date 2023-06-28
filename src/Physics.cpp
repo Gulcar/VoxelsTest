@@ -49,9 +49,8 @@ namespace voxr::Physics
         return didHit;
     }
 
-    bool Raycast(const Ray& ray, HitResult* outHit)
+    bool Raycast(const Ray& ray, HitResult* outHit, float tmax)
     {
-        float tmax = 10000.0f;
         glm::vec3 centerChunkPos = ChunkManager::GetCenterChunkPos();
         bool didHit = false;
 

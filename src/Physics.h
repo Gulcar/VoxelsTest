@@ -27,7 +27,7 @@ namespace voxr::Physics
         glm::ivec3 voxelIndex;
     };
 
-    bool Raycast(const Ray& ray, HitResult* outHit);
+    bool Raycast(const Ray& ray, HitResult* outHit, float tmax = 8.0f);
 
     bool RayAABBIntersection(const Ray& ray, const AABB& aabb, float tmax, float* t);
 }

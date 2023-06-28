@@ -2,6 +2,7 @@
 #include "VoxelRenderer.h"
 #include "ChunkManager.h"
 #include "Physics.h"
+#include "Editing.h"
 
 int main()
 {
@@ -46,7 +47,8 @@ int main()
         voxr::Physics::HitResult hit;
         if (voxr::Physics::Raycast(ray, &hit))
         {
-            voxr::DrawCube(hit.pos + glm::vec3(0, 1.0f / 16.0f, 0));
+            voxr::DrawCube(hit.pos - voxr::GetCameraForward() * 0.001f);
+            voxr::HandleVoxelEditing(hit, deltaTime);
         }
 
         glfwSwapBuffers(voxr::GetWindow());

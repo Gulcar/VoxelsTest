@@ -190,7 +190,7 @@ namespace voxr
     void Chunk::GenerateMesh()
     {
         std::vector<Vertex> vertices;
-        vertices.reserve(m_numVertices);
+        vertices.reserve(m_numVertices + 36);
 
         srand(69u);
 
