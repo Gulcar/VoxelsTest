@@ -14,6 +14,7 @@
 constexpr auto PI = 3.14159265359f;
 
 #define USE_DEBUG_CAMERA 0
+#define RANDOM_SEED 1
 
 namespace voxr
 {

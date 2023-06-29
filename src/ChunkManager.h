@@ -16,6 +16,9 @@ namespace voxr
 
         void FlushLoadQueue();
 
+        int GetSeed();
+        void SetSeed(int seed);
+
         Chunk* GetChunk(int x, int z);
         void SetChunk(Chunk* chunk, int x, int z);
 

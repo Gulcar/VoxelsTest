@@ -20,12 +20,13 @@ namespace
     };
     std::deque<LoadItem> m_loadQueue;
 
+    noise::module::Perlin m_perlin;
+
 
     void PerlinTerrain(voxr::Chunk* chunk, glm::vec2 offset)
     {
         chunk->Clear();
 
-        noise::module::Perlin perlin;
         constexpr float perlinScale = 5.0f;
 
         for (int z = 0; z < chunk->width; z++)
@@ -35,7 +36,7 @@ namespace
                 float fx = ((float)x * 1.0f / 16.0f + offset.x) / perlinScale;
                 float fz = ((float)z * 1.0f / 16.0f + offset.y) / perlinScale;
 
-                float height = perlin.GetValue(fx, 0.0f, fz);
+                float height = m_perlin.GetValue(fx, 0.0f, fz);
                 height = (height + 2.0f) / 6.0f;
 
                 int blocks = height * chunk->width;
@@ -54,6 +55,35 @@ namespace
                 {
                     chunk->SetVoxel(voxr::Voxel::Water, x, y, z);
                 }
+
+                if (blocks > 19 && blocks < 25 && x % 2 != z % 2
+                    && m_perlin.GetValue(fx, 69.0f, fz) > 0.3f && m_perlin.GetValue(fx * 1000.0f, 69.0f, fz * 1000.0f) > 0.7f
+                    && x > 1 && z > 1 && x < voxr::Chunk::width - 2 && z < voxr::Chunk::width - 2)
+                {
+                    for (int y = blocks; y < blocks + 5; y++)
+                        chunk->SetVoxel(voxr::Voxel::Wood, x, y, z);
+
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x, blocks + 5, z);
+
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x-1, blocks + 4, z);
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x, blocks + 4, z-1);
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x+1, blocks + 4, z);
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x, blocks + 4, z+1);
+
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x - 2, blocks + 3, z);
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x, blocks + 3, z - 2);
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x + 2, blocks + 3, z);
+                    chunk->SetVoxel(voxr::Voxel::Leaf, x, blocks + 3, z + 2);
+
+                    if (m_perlin.GetValue(fx * 1000.0f, -69.0f, fz * 1000.0f) > 0.2f)
+                        chunk->SetVoxel(voxr::Voxel::Leaf, x - 1, blocks + 3, z - 1);
+                    if (m_perlin.GetValue(fx * 1000.0f, 169.0f, fz * 1000.0f) > 0.2f)
+                        chunk->SetVoxel(voxr::Voxel::Leaf, x - 1, blocks + 3, z + 1);
+                    if (m_perlin.GetValue(fx * 1000.0f, 269.0f, fz * 1000.0f) > 0.2f)
+                        chunk->SetVoxel(voxr::Voxel::Leaf, x + 1, blocks + 3, z - 1);
+                    if (m_perlin.GetValue(fx * 1000.0f, 369.0f, fz * 1000.0f) > 0.2f)
+                        chunk->SetVoxel(voxr::Voxel::Leaf, x + 1, blocks + 3, z + 1);
+                }
             }
         }
 
@@ -68,17 +98,20 @@ namespace voxr
     {
         void GenerateChunks()
         {
-            TIME_FUNCTION("ChunkManager::GenerateChunks");
-
             m_centerChunkPos = glm::vec3(0, 0, 0);
 
-            for (int z = 0; z < width; z++)
+#if RANDOM_SEED
+            m_perlin.SetSeed(time(nullptr));
+#endif
+
+            for (int z = width - 1; z >= 0; z--)
             {
                 for (int x = 0; x < width; x++)
                 {
                     Chunk* chunk = new Chunk;
                     SetChunk(chunk, x, z);
-                    PerlinTerrain(chunk, glm::vec2(Chunk::worldWidth * x, Chunk::worldWidth * z));
+                    //PerlinTerrain(chunk, glm::vec2(Chunk::worldWidth * x, Chunk::worldWidth * z));
+                    m_loadQueue.push_back({ chunk, glm::vec2(Chunk::worldWidth * x, Chunk::worldWidth * z) });
                 }
             }
         }
@@ -286,6 +319,16 @@ namespace voxr
                 PerlinTerrain(loadItem.chunk, loadItem.pos);
                 m_loadQueue.pop_front();
             }
+        }
+
+        int GetSeed()
+        {
+            return m_perlin.GetSeed();
+        }
+
+        void SetSeed(int seed)
+        {
+            m_perlin.SetSeed(seed);
         }
 
         Chunk* GetChunk(int x, int z)

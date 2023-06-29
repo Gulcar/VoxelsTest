@@ -16,6 +16,7 @@ namespace voxr::Save
         glm::vec3 camPos;
         glm::vec2 camRot;
         glm::vec3 centerChunkPos;
+        int seed;
         voxr::Voxel voxelData[ChunkManager::width][ChunkManager::width][Chunk::width * Chunk::width * Chunk::width];
     };
 
@@ -50,6 +51,7 @@ namespace voxr::Save
             voxr::SetCameraPos(data->camPos);
             voxr::SetCameraRot(data->camRot);
             ChunkManager::SetCenterChunkPos(data->centerChunkPos);
+            ChunkManager::SetSeed(data->seed);
 
             ChunkManager::DeleteChunks();
 
@@ -88,6 +90,7 @@ namespace voxr::Save
         data->camPos = voxr::GetCameraPos();
         data->camRot = voxr::GetCameraRot();
         data->centerChunkPos = voxr::ChunkManager::GetCenterChunkPos();
+        data->seed = ChunkManager::GetSeed();
         
         for (int z = 0; z < ChunkManager::width; z++)
         {

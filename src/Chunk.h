@@ -14,7 +14,9 @@ enum class Voxel : uint8_t
     Air = 0,
     Grass,
     Sand,
-    Water
+    Water,
+    Wood,
+    Leaf
 };
 
 class Chunk

@@ -202,7 +202,9 @@ namespace voxr
                 {
                     float frand = (float)rand() / RAND_MAX;
 
-                    if (GetVoxel(x, y, z) == Voxel::Air)
+                    voxr::Voxel voxel = GetVoxel(x, y, z);
+
+                    if (voxel == Voxel::Air)
                         continue;
 
                     glm::vec3 center = {
@@ -213,29 +215,35 @@ namespace voxr
 
                     glm::u8vec3 color;
 
-                    if (GetVoxel(x, y, z) == Voxel::Grass)
+                    if (voxel == Voxel::Grass)
                     {
-                        constexpr glm::vec3 colorA = glm::vec3(216, 245, 86) / glm::vec3(255.0f);
-                        constexpr glm::vec3 colorB = glm::vec3(50, 191, 13) / glm::vec3(255.0f);
-                        glm::vec3 fcolor = glm::mix(colorA, colorB, frand);
-
-                        color = fcolor * 255.0f;
+                        constexpr glm::vec3 colorA = glm::vec3(216, 245, 86);
+                        constexpr glm::vec3 colorB = glm::vec3(50, 191, 13);
+                        color = glm::mix(colorA, colorB, frand);
                     }
-                    else if (GetVoxel(x, y, z) == Voxel::Sand)
+                    else if (voxel == Voxel::Sand)
                     {
-                        constexpr glm::vec3 colorA = glm::vec3(247, 227, 7) / glm::vec3(255.0f);
-                        constexpr glm::vec3 colorB = glm::vec3(255, 242, 97) / glm::vec3(255.0f);
-                        glm::vec3 fcolor = glm::mix(colorA, colorB, frand);
-
-                        color = fcolor * 255.0f;
+                        constexpr glm::vec3 colorA = glm::vec3(247, 227, 7);
+                        constexpr glm::vec3 colorB = glm::vec3(255, 242, 97);
+                        color = glm::mix(colorA, colorB, frand);
                     }
-                    else if (GetVoxel(x, y, z) == Voxel::Water)
+                    else if (voxel == Voxel::Water)
                     {
-                        constexpr glm::vec3 colorA = glm::vec3(37, 162, 245) / glm::vec3(255.0f);
-                        constexpr glm::vec3 colorB = glm::vec3(26, 130, 199) / glm::vec3(255.0f);
-                        glm::vec3 fcolor = glm::mix(colorA, colorB, frand);
-
-                        color = fcolor * 255.0f;
+                        constexpr glm::vec3 colorA = glm::vec3(37, 162, 245);
+                        constexpr glm::vec3 colorB = glm::vec3(26, 130, 199);
+                        color = glm::mix(colorA, colorB, frand);
+                    }
+                    else if (voxel == Voxel::Wood)
+                    {
+                        constexpr glm::vec3 colorA = glm::vec3(138, 79, 10);
+                        constexpr glm::vec3 colorB = glm::vec3(105, 58, 2);
+                        color = glm::mix(colorA, colorB, frand);
+                    }
+                    else if (voxel == Voxel::Leaf)
+                    {
+                        constexpr glm::vec3 colorA = glm::vec3(29, 173, 69);
+                        constexpr glm::vec3 colorB = glm::vec3(14, 227, 72);
+                        color = glm::mix(colorA, colorB, frand);
                     }
                     
 
