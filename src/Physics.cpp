@@ -1,9 +1,17 @@
 #include "Physics.h"
 #include "ChunkManager.h"
+#include "VoxelRenderer.h"
 #include <glm/glm.hpp>
 
 namespace voxr::Physics
 {
+    namespace
+    {
+        constexpr float m_gravity = -9.81f;
+        bool m_useGravity = false;
+        float m_velocity = 0.0f;
+    }
+
     bool RaycastThroughChunk(const Ray& ray, voxr::Chunk* chunk, const glm::vec3& chunkPos, HitResult* outHit, float tmax, float* tout)
     {
         bool didHit = false;
@@ -28,8 +36,8 @@ namespace voxr::Physics
                     pos += chunkPos;
 
                     AABB aabb;
-                    aabb.min = pos - aabbSize / 2.0f;
-                    aabb.max = pos + aabbSize / 2.0f;
+                    aabb.min = pos - aabbSize / 2.0f * 1.05f;
+                    aabb.max = pos + aabbSize / 2.0f * 1.05f;
 
                     float t;
                     if (RayAABBIntersection(ray, aabb, tmax, &t))
@@ -67,8 +75,8 @@ namespace voxr::Physics
                 pos += centerChunkPos;
 
                 AABB aabb;
-                aabb.min = pos - aabbSize / 2.0f;
-                aabb.max = pos + aabbSize / 2.0f;
+                aabb.min = pos - aabbSize / 2.0f * 1.05f;
+                aabb.max = pos + aabbSize / 2.0f * 1.05f;
 
                 float t;
                 if (RayAABBIntersection(ray, aabb, tmax, &t))
@@ -114,5 +122,49 @@ namespace voxr::Physics
         }
 
         return false;
+    }
+
+    void ApplyGravityToCamera(float deltaTime)
+    {
+        if (!m_useGravity) return;
+
+        m_velocity += m_gravity * deltaTime;
+        
+        glm::vec3 camPos = voxr::GetCameraPos();
+        camPos.y += m_velocity * deltaTime;
+
+        constexpr float camHeight = 0.05f;
+
+        Ray ray;
+        ray.origin = camPos + glm::vec3(0, -camHeight, 0);
+        ray.dir = glm::vec3(0.0f, -1.0f, 0.0f);
+
+        HitResult hit;
+        if (Raycast(ray, &hit, 0.5f))
+        {
+            float h = camPos.y - (hit.pos.y + 2.0f / 16.0f);
+            if (h < camHeight)
+            {
+                float target = hit.pos.y + 2.0f / 16.0f + camHeight;
+                camPos.y = glm::mix(camPos.y, target, 50.0f * deltaTime);
+                m_velocity = 0.0f;
+            }
+        }
+
+        voxr::SetCameraPos(camPos);
+    }
+
+    bool GetUseGravity()
+    {
+        return m_useGravity;
+    }
+
+    void SetUseGravity(bool gravity)
+    {
+        if (m_useGravity != gravity)
+        {
+            m_useGravity = gravity;
+            m_velocity = 0.0f;
+        }
     }
 }

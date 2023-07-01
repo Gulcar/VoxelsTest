@@ -21,6 +21,8 @@ int main()
 
         glfwPollEvents();
 
+        voxr::Physics::ApplyGravityToCamera(deltaTime);
+
         voxr::UpdateCamera(deltaTime);
         voxr::ChunkManager::UpdateCameraPos(voxr::GetCameraPos());
 

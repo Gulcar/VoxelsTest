@@ -30,4 +30,8 @@ namespace voxr::Physics
     bool Raycast(const Ray& ray, HitResult* outHit, float tmax = 8.0f);
 
     bool RayAABBIntersection(const Ray& ray, const AABB& aabb, float tmax, float* t);
+
+    void ApplyGravityToCamera(float deltaTime);
+    bool GetUseGravity();
+    void SetUseGravity(bool gravity);
 }

@@ -5,6 +5,7 @@
 #include <glText/gltext.h>
 #include "ChunkManager.h"
 #include "Save.h"
+#include "Physics.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -45,6 +46,7 @@ namespace
 
     constexpr float m_moveSpeed = 2.0f;
     constexpr float m_sprintSpeedMult = 2.5f;
+    constexpr float m_walkSpeedMult = 0.4f; // ko je gravitacija
     constexpr double m_rotationSpeed = 0.9;
 
 
@@ -93,6 +95,10 @@ namespace
         case GLFW_KEY_O:
             if (mods & GLFW_MOD_CONTROL)
                 voxr::Save::OpenWorld();
+            break;
+
+        case GLFW_KEY_G:
+            voxr::Physics::SetUseGravity(!voxr::Physics::GetUseGravity());
             break;
         }
     }
@@ -286,6 +292,12 @@ namespace voxr
         {
             moveForward *= m_sprintSpeedMult;
             moveRight *= m_sprintSpeedMult;
+        }
+
+        if (Physics::GetUseGravity())
+        {
+            moveForward *= m_walkSpeedMult;
+            moveRight *= m_walkSpeedMult;
         }
 
         if (glfwGetKey(m_window, GLFW_KEY_W))
