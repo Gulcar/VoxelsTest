@@ -31,13 +31,26 @@ namespace voxr::Save
         }
     }
 
+    void CheckIfDialogsAvailable()
+    {
+        if (pfd::settings::available() == false)
+        {
+            std::cout << "The file dialogs are not available on your system!\n";
+            std::cout << "If you are on Linux try installing Zenity(gtk) or KDialog(qt)!\n";
+        }
+    }
+
     void OpenWorld()
     {
+        CheckIfDialogsAvailable();
+
         pfd::open_file dialog("Open Your Voxel World", ".", { "Voxel World File ", "*.vxl", "All Files", "*" }, pfd::opt::none);
+
         auto dialogResult = dialog.result();
         if (dialogResult.empty()) return;
         std::string fileName = dialogResult[0];
         if (fileName.empty()) return;
+
         AddFileExtension(fileName);
 
         voxr::ChunkManager::FlushLoadQueue();
@@ -79,7 +92,10 @@ namespace voxr::Save
 
     void SaveWorld()
     {
+        CheckIfDialogsAvailable();
+
         pfd::save_file dialog("Save Your Voxel World", ".", { "Voxel World File ", "*.vxl", "All Files", "*" }, pfd::opt::none);
+
         std::string fileName = dialog.result();
         if (fileName.empty()) return;
         AddFileExtension(fileName);
