@@ -89,12 +89,32 @@ namespace
 
         case GLFW_KEY_S:
             if (mods & GLFW_MOD_CONTROL)
+            {
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
                 voxr::Save::SaveWorld();
+
+                if (m_mouseEnabled)
+                {
+                    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    glfwGetCursorPos(m_window, &m_prevMousePos.x, &m_prevMousePos.y);
+                }
+            }
             break;
 
         case GLFW_KEY_O:
             if (mods & GLFW_MOD_CONTROL)
+            {
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
                 voxr::Save::OpenWorld();
+
+                if (m_mouseEnabled)
+                {
+                    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    glfwGetCursorPos(m_window, &m_prevMousePos.x, &m_prevMousePos.y);
+                }
+            }
             break;
 
         case GLFW_KEY_G:
