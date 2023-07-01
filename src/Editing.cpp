@@ -4,6 +4,10 @@
 
 namespace voxr
 {
+    namespace
+    {
+        float m_ignoreClickTime = 0.0f;
+    }
 
 void HandleVoxelEditing(voxr::Physics::HitResult& hit, float deltaTime)
 {
@@ -11,6 +15,12 @@ void HandleVoxelEditing(voxr::Physics::HitResult& hit, float deltaTime)
     static float timeHoldingLeft = 0.0f;
 
     constexpr float editsPerSecond = 17.5f;
+
+    if (m_ignoreClickTime > 0.0f)
+    {
+        m_ignoreClickTime -= deltaTime;
+        return;
+    }
 
     if (glfwGetMouseButton(voxr::GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
     {
@@ -101,6 +111,11 @@ void HandleVoxelEditing(voxr::Physics::HitResult& hit, float deltaTime)
     {
         timeHoldingLeft = 0.0f;
     }
+}
+
+void SetIgnoreClickTime(float time)
+{
+    m_ignoreClickTime = time;
 }
 
 }

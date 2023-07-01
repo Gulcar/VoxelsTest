@@ -6,6 +6,7 @@
 #include "ChunkManager.h"
 #include "Save.h"
 #include "Physics.h"
+#include "Editing.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -131,9 +132,13 @@ namespace
         {
         case GLFW_MOUSE_BUTTON_LEFT:
         case GLFW_MOUSE_BUTTON_RIGHT:
-            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            m_mouseEnabled = true;
-            glfwGetCursorPos(m_window, &m_prevMousePos.x, &m_prevMousePos.y);
+            if (m_mouseEnabled == false)
+            {
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                glfwGetCursorPos(m_window, &m_prevMousePos.x, &m_prevMousePos.y);
+                voxr::SetIgnoreClickTime(0.7f);
+                m_mouseEnabled = true;
+            }
             break;
         }
     }
